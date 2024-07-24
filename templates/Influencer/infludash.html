@@ -1,0 +1,159 @@
+{% extends 'layout.html' %}
+{% block content %}
+  
+
+<div id="trans-table">                         
+    <h4 class="headings" style="margin-top: 15px">Ad Requests from Sponsor</h4>
+    <hr>
+    {% if pending_adreqs|length == 0 %}
+    <h6>No Ad Requests from Sponsor</h6>
+    {% else %}
+    <div id="trans-table" style="margin: 10px;">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>                        
+            <th scope="col">Campaign Name</th>                    
+            <th scope="col">Requirements</th>
+            <th scope="col">Payment Amount</th>                        
+            <th scope="col">Messages</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for a in pending_adreqs %}
+          <tr>
+            <td scope="row">{{loop.index}}</td>                    
+            <td>{{a.campaign.camp_name}} </td> 
+            <td>{{a.requirements}}</td>
+            <td>{{a.pay_amt}}</td>
+            <td>{{a.messages.meesage_body}}</td>                
+            <td>
+              <a href="{{url_for('accept_adreq',ad_id=a.id)}}" type="button" class="btn btn-success">Accept</a>
+              <a href="{{url_for('reject_adreq',ad_id=a.id)}}" type="button" class="btn btn-danger">Reject</a>
+              <a href="#" type="button" class="btn btn-secondary">Send Message</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+<hr>
+</div>
+<br>
+
+<div id="trans-table">                         
+  <h4 class="headings" style="margin-top: 15px">Ad Requests sent to Sponsor</h4>
+  <hr>
+  {% if requested_adreqs|length == 0 %}
+  <h6>No Ad Requests sent to Sponsor</h6>
+  {% else %}
+  <div id="trans-table" style="margin: 10px;">
+  <table class="table">
+      <thead>
+      <tr>
+          <th scope="col">#</th>                        
+          <th scope="col">Campaign Name</th>                    
+          <th scope="col">Requirements</th>
+          <th scope="col">Payment Amount</th>                        
+          <th scope="col">Messages</th>
+          <th scope="col">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for a in requested_adreqs %}
+        <tr>
+          <td scope="row">{{loop.index}}</td>                    
+          <td>{{a.campaign.camp_name}} </td> 
+          <td>{{a.requirements}}</td>
+          <td>{{a.pay_amt}}</td>
+          <td>{{a.messages.meesage_body}}</td>                
+          <td>
+            <a href="#" type="button" class="btn btn-secondary">Send Message</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+</div>
+{% endif %}
+<hr>
+</div>
+<br>
+<div id="trans-table">                         
+  <h4 class="headings" style="margin-top: 15px">Messages from sponsor</h4>
+  <hr>
+  {% if messages|length == 0 %}
+  <h6>No Messages</h6>
+  {% else %}
+  <div id="trans-table" style="margin: 10px;">
+  <table class="table">
+      <thead>
+      <tr>
+          <th scope="col">#</th>                        
+          <th scope="col">Campaign Name</th>                    
+          <th scope="col">Messages</th>
+          <th scope="col">From Sponsor</th>
+          <th scope="col">Time</th>                        
+          <th scope="col">Actions</th>
+          <th scope="col">Accept</th>
+          <th scope="col">Reject</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for message in messages %}
+        <tr>
+          <td scope="row">{{loop.index}}</td>                    
+          <td>{{message.adreq.camapign.camp_name}} </td> 
+          <td>{{message.message_body}}</td>
+          <td>{{message.adreq.camapign.sponsor.name}}</td>
+          <td>{{a.datetime}}</td>                
+          <td><a href="#" type="button" class="btn btn-warning">Message Back</a></td>
+          <td><a href="#" type="button" class="btn btn-success">Accept</a></td>
+          <td><a href="#" type="button" class="btn btn-danger">Reject</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+</div>
+{% endif %}
+<hr>
+</div>
+<br>
+
+<div id="trans-table">                         
+  <h4 class="headings" style="margin-top: 15px">Active Campaigns</h4>
+  <hr>
+  {% if accepted_adreqs|length == 0 %}
+  <h6>No Active Campaigns</h6>
+  {% else %}
+  <div id="trans-table" style="margin: 10px;">
+  <table class="table">
+      <thead>
+      <tr>
+          <th scope="col">#</th>                        
+          <th scope="col">Campaign Name</th>                    
+          <th scope="col">Requirements</th>
+          <th scope="col">Payment Amount</th>                        
+          <th scope="col">Messages</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for a in accepted_adreqs %}
+        <tr>
+          <td scope="row">{{loop.index}}</td>                    
+          <td>{{a.campaign.camp_name}} </td> 
+          <td>{{a.requirements}}</td>
+          <td>{{a.pay_amt}}</td>
+          <td>{{a.messages.meesage_body}}</td>                
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+</div>
+{% endif %}
+<hr>
+</div>
+<br>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <h1>Search</h1>
+    <form class="d-flex" role="search" action="{{url_for('sponsor_search')}}">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" {% if query %}
+        value="{{query}}"
+        {% endif %}>
+        <button class="btn btn-outline-success" type="submit">
+            Search
+        </button>
+    </form>
+    <br>
+    <hr>
+    {% if not query %}
+        <h4>Campaigns</h4>
+        <hr>
+        {% if all_campaigns | length == 0 %}
+            <h6>No campaigns made</h6>
+        {% else %}
+            <div id="trans-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Campaign Name</th>                    
+                        <th scope="col">Start date</th>
+                        <th scope="col">End date</th>                    
+                        <th scope="col">Description</th>
+                        <th scope="col">Request</th>               
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in all_campaigns %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{c.camp_name}} </td>
+                            <td>{{c.start_date}}</td>                    
+                            <td>{{c.end_date}}</td>                        
+                            <td>{{c.description}}</td>
+                            <td>
+                                <a href="{{url_for('adreqs_list',id=c.id)}}" type="button" class="btn btn-warning"><i class="fa fa-book" aria-hidden="true"></i> Open</a>
+                                <a href="{{url_for('edit_campaign',id=c.id)}}" type="button" class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+                                <a href="{{url_for('delete_campaign',id=c.id)}}" type="button" class="btn btn-danger" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+                        
+        {% endif %}
+
+        <h4>Influencers</h4>
+        <hr>
+        {% if all_influencers | length == 0 %}
+            <h6>No influencers available</h6>
+        {% else %}
+            <div id="trans-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Influencer username</th>                    
+                        <th scope="col">Reach</th>
+                        <th scope="col">Niche</th>                    
+                        <th scope="col">Category</th>
+                        <th scope="col">Platform</th>               
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in all_influencers %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{i.name}} </td>
+                            <td>{{i.reach}}</td>                    
+                            <td>{{i.niche}}</td>                        
+                            <td>{{i.category}}</td>
+                            <td>{{i.platform}}</td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% else %}
+        <h4>Campaigns</h4>
+        <hr>
+
+            {% if campaigns %}
+            <div id="trans-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Campaign Name</th>                    
+                        <th scope="col">Start date</th>
+                        <th scope="col">End date</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Request</th>               
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in campaigns %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{c.camp_name}} </td>
+                            <td>{{c.start_date}}</td>                    
+                            <td>{{c.end_date}}</td>
+                            <td>{{c.description}}</td>
+                            <td>            
+                                <a href="{{url_for('adreqs_list',id=c.id)}}" type="button" class="btn btn-warning"><i class="fa fa-book" aria-hidden="true"></i> Open</a>
+                                <a href="{{url_for('edit_campaign',id=c.id)}}" type="button" class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+                                <a href="{{url_for('delete_campaign',id=c.id)}}" type="button" class="btn btn-danger" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        {% else %}
+            <h6>No campaign matches found.</h6>
+        {% endif %}
+        <br>
+        <h4>Influencers</h4>
+        <hr>
+        {% if influencers %}
+            <div id="trans-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Influencer username</th>                    
+                        <th scope="col">Reach</th>
+                        <th scope="col">Niche</th>                    
+                        <th scope="col">Category</th>
+                        <th scope="col">Platform</th>               
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in influencers %}
+                            <tr>
+                                <th scope="row">{{loop.index}}</th>
+                                <td>{{i.name}} </td>
+                                <td>{{i.reach}}</td>                    
+                                <td>{{i.niche}}</td>                        
+                                <td>{{i.category}}</td>
+                                <td>{{i.platform}}</td> 
+                            </tr>
+                        {% endfor %}  
+                    </tbody>
+                </table>
+            </div> 
+        {% else %}
+            <h6>No influencer matches found.</h6>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

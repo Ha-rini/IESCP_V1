@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block content %}
+    
+
+            <form action="/login" method='POST'> 
+                <h1 align="center">Login</h1>
+                <div class="mb-3">
+                    <label for="login-username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="login-username" placeholder="username@gmail.com" name="log_email" >
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="login-password" placeholder="password" name="password">
+                </div>
+                <div style="text-align:center">
+                    <input type="submit" class="btn btn-primary" value="Login">
+                </div>
+            </form>
+         
+                <div style="text-align:center">
+                    
+                    <br><br>Are you a new user? <a href="/register">Register</a></p>
+                </div>
+                {% endblock %}

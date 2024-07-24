@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block content %}
+<form action="{{url_for('add_campaign_post',id=sponsor.id)}}" method="POST"> 
+<h1 align="center">Add Campaign</h1>
+    <div class="mb-3">
+        <label for="camp-name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="camp-name" placeholder="Name of Campaign" name="camp-name">
+    </div>
+    <div class="mb-3">
+        <label for="start-date" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="start-date" placeholder="Start date" name="start-date" >
+    </div>
+    <div class="mb-3">
+        <label for="end-date" class="form-label">End Date</label>
+        <input type="date" class="form-control" id="end-date" placeholder="End date" name="end-date" >
+    </div>
+    <div class="mb-3">
+        <label for="budget" class="form-label">Budget</label>
+        <input type="number" class="form-control" id="budget" placeholder="Budget for campaign" name="budget" >
+    </div>
+    <div class="mb-3">
+        <label for="camp-desc" class="form-label">Description</label>
+        <input type="text" class="form-control" id="camp-desc" placeholder="Description" name="camp-desc" >
+    </div>
+    <div class="mb-3">
+        <label for="camp-goal" class="form-label">Goals</label>
+        <input type="text" class="form-control" id="camp-goal" placeholder="Goals" name="camp-goal" >
+    </div>
+    <div class="mb-3">
+        <label for="camp-visbl" class="form-label">Visibility</label>
+        <select id="camp-visbl"  class="form-control"  placeholder="Description" name="camp-visibility">
+            <option>Public</option>
+            <option>Private</option>
+        </select>
+        <div style="text-align:center;padding: 50px;">
+            
+            <a href="{{url_for('home')}}" class="btn btn-danger">Cancel</a>                   
+            <input type="submit" class="btn btn-success" value="Add">
+        </div>
+    </div>
+    </form>
+
+
+{% endblock %}

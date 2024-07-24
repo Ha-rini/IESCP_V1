@@ -1,0 +1,193 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>Search</h1>
+    <form class="d-flex" role="search" action="{{url_for('admin_search')}}">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" {% if query %}
+        value="{{query}}"
+        {% endif %}>
+        <button class="btn btn-outline-success" type="submit">
+            Search
+        </button>
+    </form>
+    <br>
+    <hr>
+    {% if not query %}
+        <h3>Users</h3>
+        <hr>
+        <div id="trans-table">
+            <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in all_users %}
+                <tr>
+                    <td>{{user.id}}</td>
+                    <td>{{user.username}}</td>
+                    <td>{{user.role}}</td>
+                    <td>
+                        {% if not user.is_admin and not user.is_flagged%}
+                            <form action="{{url_for('flag_user',id=user.id)}}" method="POST">
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                            </form>
+                        {% elif user.is_flagged %}
+                            <p style="color:red">Flagged</p>
+                        {% else %}
+                            <p><b>Cannot flag admin.</b></p>
+                        {% endif %}
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    <br>
+    <h3>Campaigns</h3>
+    <hr>
+    {% if all_campaigns|length == 0 %}
+        <h6>No Campaigns</h6>
+        
+    {% else %}        
+        <div id="trans-table">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Campaign Name</th>                    
+                    <th scope="col">Start date</th>
+                    <th scope="col">End date</th>
+                    <th scope="col">Budgets</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Goals</th>
+                    <th scope="col">Visibility</th>
+                    <th scope="col">Actions</th>               
+                </tr>
+                </thead>
+                <tbody>
+                    {% for c in all_campaigns %}
+                    <tr>
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{c.camp_name}} </td>
+                        <td>{{c.start_date}}</td>                    
+                        <td>{{c.end_date}}</td>
+                        <td>{{c.budget}}</td>
+                        <td>{{c.description}}</td>
+                        <td>{{c.goals}}</td>
+                        <td>{{c.visibility}}</td>        
+                        <td>
+                            {% if c.is_flagged==False %}
+                            <form action="{{url_for('flag_campaign',id=c.id)}}" method="POST">
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                            </form>
+                            {% else %}
+                                <p style="color:red">Flagged</p>
+                            {% endif %}
+                            
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% else %}
+    <h3>Users</h3>
+    <hr>
+    {% if users %}
+        <div id="trans-table">
+            <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{user.id}}</td>
+                    <td>{{user.username}}</td>
+                    <td>{{user.role}}</td>
+                    <td>
+                        {% if not user.is_admin and not user.is_flagged%}
+                            <form action="{{url_for('flag_user',id=user.id)}}" method="POST">
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                            </form>
+                        {% elif user.is_flagged %}
+                            <p style="color:red">Flagged</p>
+                        {% else %}
+                            <p><b>Cannot flag admin.</b></p>
+                        {% endif %}
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else%}
+        <h6>No user matches found.</h6>
+    {% endif %}
+    <br>
+    <h3>Campaigns</h3>
+    <hr>
+    {% if campaigns %}      
+        <div id="trans-table">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Campaign Name</th>                    
+                    <th scope="col">Start date</th>
+                    <th scope="col">End date</th>
+                    <th scope="col">Budgets</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Goals</th>
+                    <th scope="col">Visibility</th>
+                    <th scope="col">Actions</th>               
+                </tr>
+                </thead>
+                <tbody>
+                    {% for c in campaigns %}
+                    <tr>
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{c.camp_name}} </td>
+                        <td>{{c.start_date}}</td>                    
+                        <td>{{c.end_date}}</td>
+                        <td>{{c.budget}}</td>
+                        <td>{{c.description}}</td>
+                        <td>{{c.goals}}</td>
+                        <td>{{c.visibility}}</td>        
+                        <td>
+                            {% if c.is_flagged==False %}
+                            <form action="{{url_for('flag_campaign',id=c.id)}}" method="POST">
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                            </form>
+                            {% else %}
+                                <p style="color:red">Flagged</p>
+                            {% endif %}
+                            
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    
+    {% else %}
+        <h6>No campaign matches found.</h6>
+    {% endif %}
+
+{% endif %} 
+{% endblock %}
+

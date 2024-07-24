@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block content %}
+    
+            <form action="{{url_for('request_adreq',id=campaign.id)}}" method="POST">
+              <div  id="new-box">
+              <h5 align="center">New Ad Request</h5>
+                <div class="mb-3">
+                  <label for="infu-name" class="form-label">Influencer Name</label>
+                  <input type="text" class="form-control" id="influ-name" placeholder="Influencer Name" name="influ-name" value="{{influencer.name}}" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="camp-name" class="form-label">Campaign Name</label>
+                  <input type="text" class="form-control" id="camp-name" placeholder="Campaign Name" name="camp-name" value="{{campaign.camp_name}}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <input type="text" class="form-control" id="message" placeholder="Message sent to sponsor" name="message" >
+                </div>
+                
+                <div class="mb-3">
+                  <label for="amt" class="form-label">Payment Amount</label>
+                  <input type="number" class="form-control" id="amt" placeholder="Payment for the influencer" name="amt" >
+                </div>      
+
+                <div style="text-align:center;padding: 50px;">
+                  <a href="{{url_for('home')}}"><button type="button" class="btn btn-danger">Cancel</button></a>                   
+                  <button type="submit" class="btn btn-primary">Request</button>
+              </div>
+            </div>
+          </form>
+          {% endblock %}

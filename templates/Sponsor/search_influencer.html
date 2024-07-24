@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <h1>Search</h1>
+    <form class="d-flex" role="search" action="{{url_for('search_influencer',id=id)}}">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" {% if query %}
+        value="{{query}}"
+        {% endif %}>
+        <button class="btn btn-outline-success" type="submit">
+            Search
+        </button>
+    </form>
+    <br>
+    <hr>
+    <h4>Influencers</h4>
+    {% if not query %}
+        {% if all_influencers | length == 0 %}
+            <h6>No influencers available</h6>
+        {% else %}
+            <div id="trans-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Influencer username</th>                    
+                        <th scope="col">Reach</th>
+                        <th scope="col">Niche</th>                    
+                        <th scope="col">Category</th>
+                        <th scope="col">Platform</th> 
+                        <th scope="col">Actions</th> 
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in all_influencers %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{i.name}} </td>
+                            <td>{{i.reach}}</td>                    
+                            <td>{{i.niche}}</td>                        
+                            <td>{{i.category}}</td>
+                            <td>{{i.platform}}</td>
+                            <td>
+                                <a href="#" type="button" class="btn btn-primary"><i class="fa fa-user" aria-hidden="true"></i> View Profile</a>
+                                <a href="{{url_for('select_influencer',id=id,influ_id=i.id)}}" type="button" class="btn btn-success"><i class="fa fa-check-circle" aria-hidden="true"></i> Select</a>
+                            </td>  
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% else %}
+    {% if influencers %}
+            <div id="trans-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Influencer username</th>                    
+                        <th scope="col">Reach</th>
+                        <th scope="col">Niche</th>                    
+                        <th scope="col">Category</th>
+                        <th scope="col">Platform</th>               
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in influencers %}
+                            <tr>
+                                <th scope="row">{{loop.index}}</th>
+                                <td>{{i.name}} </td>
+                                <td>{{i.reach}}</td>                    
+                                <td>{{i.niche}}</td>                        
+                                <td>{{i.category}}</td>
+                                <td>{{i.platform}}</td> 
+                            </tr>
+                        {% endfor %}  
+                    </tbody>
+                </table>
+            </div> 
+        {% else %}
+            <h6>No influencer matches found.</h6>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

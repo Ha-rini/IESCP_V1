@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+{% block content %}
+    
+            <form action="{{url_for('edit_adreq',id=campaign.id,ad_id=adreq.id)}}" method="POST">
+              <div  id="new-box">
+              <h5 align="center">Edit Ad Request</h5>              
+                <label for="infu-name" class="form-label">Influencer Name</label>
+                <input type="text" class="form-control" id="influ-name" placeholder="Influencer Name" name="influ-name" value="{{adreq.influencer.name}}">
+                <button type="button" class="btn btn-primary mb-3">
+                  <i class="fa fa-search" aria-hidden="true"></i> Find Influencer
+                </button>
+                <div class="mb-3">
+                  <label for="camp-name" class="form-label">Campaign Name</label>
+                  <input type="text" class="form-control" id="camp-name" placeholder="Campaign Name" name="camp-name" value="{{campaign.camp_name}}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <input type="text" class="form-control" id="message" placeholder="Message sent to influencer" name="message" value="{{message.message_body}}" readonly >
+                </div>
+                <div class="mb-3">
+                  <label for="req" class="form-label">Requirements</label>
+                  <input type="text" class="form-control" id="req" placeholder="Requirements for the ad" name="requirements" value="{{adreq.requirements}}">
+                </div>
+                <div class="mb-3">
+                  <label for="amt" class="form-label">Payment Amount</label>
+                  <input type="number" class="form-control" id="amt" placeholder="Payment for the influencer" name="amt" value="{{adreq.pay_amt}}">
+                </div>      
+
+                <div style="text-align:center;padding: 50px;">
+                  <a href="{{url_for('adreqs_list',id=campaign.id)}}"><button type="button" class="btn btn-danger">Cancel</button></a>                   
+                  <button type="submit" class="btn btn-success">Edit</button>
+                  <a href="{{url_for('adreq_complete',id=campaign.id,ad_id=adreq.id)}}"><button type="button" class="btn btn-primary">Mark as completed</button></a>
+              </div>
+            </div>
+          </form>
+          {% endblock %}

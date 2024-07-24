@@ -1,0 +1,93 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h3>List of Active Campaigns</h3>
+    <hr>
+    {% if notflag_campaigns|length == 0 %}
+    <h6>No Campaigns</h6>
+    
+    {% else %}        
+    <div id="trans-table">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Campaign Name</th>                    
+                <th scope="col">Start date</th>
+                <th scope="col">End date</th>
+                <th scope="col">Budgets</th>
+                <th scope="col">Description</th>
+                <th scope="col">Goals</th>
+                <th scope="col">Visibility</th>
+                <th scope="col">Actions</th>               
+            </tr>
+            </thead>
+            <tbody>
+                {% for c in notflag_campaigns %}
+                <tr>
+                    <th scope="row">{{loop.index}}</th>
+                    <td>{{c.camp_name}} </td>
+                    <td>{{c.start_date}}</td>                    
+                    <td>{{c.end_date}}</td>
+                    <td>{{c.budget}}</td>
+                    <td>{{c.description}}</td>
+                    <td>{{c.goals}}</td>
+                    <td>{{c.visibility}}</td>        
+                    <td>
+                        <form action="{{url_for('flag_campaign',id=c.id)}}" method="POST">
+                            <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<h3>List of Flagged Campaigns</h3>
+<hr>
+{% if flag_campaigns | length == 0 %}
+        <h5>No Flagged campaigns</h5>
+            
+{% else %}
+<div id="trans-table">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Campaign Name</th>                    
+            <th scope="col">Start date</th>
+            <th scope="col">End date</th>
+            <th scope="col">Budgets</th>
+            <th scope="col">Description</th>
+            <th scope="col">Goals</th>
+            <th scope="col">Visibility</th>
+            <th scope="col">Actions</th>               
+        </tr>
+        </thead>
+        <tbody>
+            {% for c in flag_campaigns %}
+            <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{c.camp_name}} </td>
+                <td>{{c.start_date}}</td>                    
+                <td>{{c.end_date}}</td>
+                <td>{{c.budget}}</td>
+                <td>{{c.description}}</td>
+                <td>{{c.goals}}</td>
+                <td>{{c.visibility}}</td>
+                <td>
+                    <form action="{{url_for('unflag_campaign',id=c.id)}}" method="POST">
+                        <button class="btn btn-danger" type="submit"><i class="fa fa-flag-checkered" aria-hidden="true"></i> UnFlag</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+</div>
+
+{% endblock %}

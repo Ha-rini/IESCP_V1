@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+{% block content %}
+<form action="{{url_for('influ_register',user_id=user.id)}}" method='POST'>
+        <h1 align="center"> Influencer Register</h1>
+        <div class="mb-3">
+            <label for="influ-name" class="form-label">Username</label>
+            <input type="text" class="form-control" id="influ-name" placeholder="Name used in social media platforms" name="name" >
+        </div>
+        <div class="mb-3">
+            <label for="influ-niche" class="form-label">Niche</label>
+            <input type="text" class="form-control" id="influ-niche" placeholder="Niche" name="niche">
+        </div>
+        <div class="mb-3">
+            <label for="influ-category" class="form-label">Category</label>
+            <input type="text" class="form-control" id="influ-niche" placeholder="Category" name="category">
+        </div>
+        <div class="mb-3">
+            <label for="reach" class="form-label">Reach</label>
+            <select name="reach" class="form-control"  id="reach" placeholder="Reach on social media platforms">
+                <option value="1k-5k">1k-5k</option>
+                <option value="5k-10k">5k-10k</option>
+                <option value="10k-20k">10k-20k</option>
+                <option value="20k-50k">20k-50k</option>
+                <option value="50k-1M">50k-1M</option>
+                <option value="1M+">1M+</option>
+                </select>
+        </div>
+        <div>
+            <label for="platform" class="form-label">Platform</label>
+            <select name="platform" id="platform" class="form-control" placeholder="Platform used by you as an influencer">
+                <option value="Youtube"><i class="fa fa-youtube" aria-hidden="true"></i>Youtube</option>
+                <option value="Instagram"><i class="fa fa-instagram" aria-hidden="true"></i>Instagram</option>
+                <option value="Twitter "><i class="fa fa-twitter" aria-hidden="true"></i>Twitter</option>
+            </select>
+        </div>
+        <div style="text-align:center">
+            <input type="submit" class="btn btn-primary" value="Register">
+        </div>
+    </form>
+
+    <div style="text-align:center">
+        <br><br>Already registered? <a href="/login">Go to Login.</a></p>
+    </div>
+    
+{% endblock %} 

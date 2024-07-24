@@ -1,0 +1,126 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+<style>
+    .d-flex {
+      display: flex !important;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<form action="{{url_for('update_profile',id=user.id)}}" method="post">
+<div class="mb-3">
+    <div class="d-flex">
+      <div class="card mb-3" style="width: 18rem;">
+          <div class="card-img-top">
+              <img src="{{profile_pic}}" class="card-img-top" alt="Profile pic" style="height:300px">
+          </div>
+          <div class="card-body">
+            <h4 class="card-title">{{user.username}}</h4>
+            <div class="mb-3 card-title">
+              <label for="name" class="form-label">Username:</label>
+              <input type="text" class="form-control" id="name" placeholder="Username" name="name" value="{{influencer.name}}" readonly>
+            </div>
+            <p class="card-text">About: <br>
+              <textarea name="about" id="about" placeholder="Write something about yourself.." class="form-control mb-3">{{influencer.about}}</textarea>
+              
+          </div>
+      </div>
+      <div>
+        <div class="card mb-3" style="padding:10px">
+          <div class="mb-3" style="width: 18rem;">
+              
+              <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
+                <input type="text" class="form-control" id="category" placeholder="Category" name="category" value="{{influencer.category}}">
+              </div>
+              <div class="mb-3">
+                  <label for="niche" class="form-label">Niche:</label>
+                  <input type="text" class="form-control" id="niche" placeholder="Niche" name="niche" value="{{influencer.niche}}">
+              </div>
+              <div class="mb-3">
+                <label for="reach" class="form-label">Reach:</label>
+                <input type="text" class="form-control" id="reach" placeholder="Reach" name="reach" value="{{influencer.reach}}" >
+              </div>
+              <div class="mb-3">
+                <label for="platform" class="form-label">Platform:</label>
+                <input type="text" class="form-control" id="platform" placeholder="Platform" name="platform" value="{{influencer.platform}}" >
+              </div>
+          </div>
+          <div class="mb-3">
+              <h6 class="card-title">Campaigns Participated in:</h6>
+              
+              {% if influencer.adreqs | length == 0%}
+                <h6>No campaigns yet</h6>
+                
+              {% else %}
+              <ul class="list-group">
+                {% for adreq in influencer.adreqs %}
+
+                  <li class="list-group-item"><h6 class="card-title">{{adreq.campaign.camp_name}}</h6></li>   
+                {% endfor %}
+              </ul>
+              {% endif %}
+              
+          </div>
+        </div> 
+      </div>
+      
+    </div>
+    <div class="d-flex">
+      <div>
+        <div class="mb-3">
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
+          </form>
+          <button class="btn btn-primary mb-3" type="button" onclick="change_pass_show()">Change Password</button>
+          <div id="change_pass" class="mb-3" style="display: none;">
+        <form action="{{url_for('change_pass',id=user.id)}}" method="post">
+            <label for="password" class="form-label"> Current Password</label>
+            <input type="password" class="form-control" id="password" name="password">
+            <label for="npassword" class="form-label"> New Password</label>
+            <input type="password" class="form-control" id="npassword" name="npassword">
+            <label for="confpassword" class="form-label"> Confirm Password</label>
+            <input type="password" class="form-control mb-3" id="confpassword" name="confpassword">
+            <div style="text-align:center" class="mb-3">
+                <input type="submit" class="btn btn-primary" value="Change">
+            </div>
+        </form>
+          </div>
+      </div>
+      <div>
+        <div class="mb-3">
+          <form action="#" method="post">
+              <button type="submit" class="btn btn-warning mb-3">Change Profile Pic</button>
+          </form>
+        </div>
+        <div class="mb-3">
+          <form action="{{url_for('delete_user',id=user.id)}}" method="post">
+              <button type="submit" class="btn btn-danger mb-3">Delete My Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock content %}
+
+
+  {% block script %}
+  <script>
+    function change_pass_show() {
+      var x = document.getElementById("change_pass");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+    </script>
+    
+  {% endblock %}
+
+  

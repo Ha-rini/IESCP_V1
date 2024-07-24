@@ -1,0 +1,268 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <style>
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .chart-container canvas {
+            max-width: 45%;
+            margin: 10px 0;
+        }
+    </style>
+
+    {% if user.role == 'Influencer' %}
+        <div class="chart-container">
+            <canvas id="influChart1"></canvas>
+            <canvas id="influChart2"></canvas>
+        </div>
+    {% elif user.role == "Sponsor" %}
+        <div class="chart-container">
+            <canvas id="spoChart1"></canvas>
+            <canvas id="spoChart2"></canvas>
+        </div>
+    {% elif user.role=="Admin" %}
+        <div class="chart-container">
+            <canvas id="adminChart1"></canvas>
+            <canvas id="adminChart2"></canvas>
+            <canvas id="adminChart3"></canvas>
+        </div>
+    {% else %}
+        <h5>No Stats for you :/</h5>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        {% if user.role == 'Admin' %}
+        const adminctx1 = document.getElementById('adminChart1');
+        const adminctx2 = document.getElementById('adminChart2');
+        const adminctx3 = document.getElementById('adminChart3');
+        if (adminctx1) {
+            new Chart(adminctx1, {
+                type: 'doughnut',
+            data: {
+                
+                datasets: [{
+                    data: [{id: 'Active Users', value: '{{notflag_users | length }}' }, {id: 'Flagged Users', value: '{{flag_users | length }}' }]
+                    }],
+                    labels: [
+                    'Active Users',
+                    'Flagged Users',
+                ]
+                
+            },
+            
+            options: {
+                parsing: {
+                key: 'value'
+                },
+                radius: "40%",
+                }
+            });   
+        }
+        if (adminctx2) {
+            new Chart(adminctx2, {
+                type: 'doughnut',
+            data: {
+                
+                datasets: [{
+                    data: [{id: 'Active Campaigns', value: '{{notflag_campaigns | length }}' }, {id: 'Flagged Campaigns', value: '{{flag_campaigns | length }}' }]
+                    }],
+                    labels: [
+                    'Active Campaigns',
+                    'Flagged Campaigns',
+                ]
+            },
+            
+            options: {
+                parsing: {
+                key: 'value'
+                },
+                radius: "40%",
+                }
+            });
+            
+        }
+    
+    
+        if (adminctx3){
+    
+            const labels = ["Sponsors","Influencers"];
+            const data = {
+            labels: labels,
+            datasets: [{
+            label: 'Users',
+            data: ["{{sponsors | length}}", "{{campaigns | length}}"],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+            ],
+            borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+            ],
+            borderWidth: 1
+            }]
+            };
+            const config = {
+                type: 'bar',
+                data: data,
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                },
+              };
+            new Chart(adminctx3,config);
+            
+        }
+    {% endif %}
+    
+        {% if user.role == 'Sponsor' %}
+            const spoctx1 = document.getElementById('spoChart1');
+            const spoctx2 = document.getElementById('spoChart2');
+
+            if (spoctx1) {
+                new Chart(spoctx1, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [{{ active_campaigns | length }}, {{ completed_campaigns | length }}],
+                            backgroundColor: ['#4caf50', '#9e9e9e']
+                        }],
+                        labels: ['Active Campaigns', 'Completed Campaigns']
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        parsing: {
+                            key: 'value'
+                        },
+                    }
+                });
+            }
+
+            if (spoctx2) {
+                new Chart(spoctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ["Pending", "Requested", "Accepted", "Rejected", "Completed"],
+                        datasets: [{
+                            label: 'Status of Campaigns',
+                            data: {{ data_counts | safe }},
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        {% endif %}
+
+        {% if user.role == 'Influencer' %}
+            const influctx1 = document.getElementById('influChart1');
+            const influctx2 = document.getElementById('influChart2');
+
+            if (influctx1) {
+                new Chart(influctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: ["Requested", "Accepted", "Rejected", "Completed"],
+                        datasets: [{
+                            label: 'Status of Ad Requests',
+                            data: {{ data_counts | safe }},
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(255, 99, 132, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(255, 99, 132)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (influctx2) {
+                new Chart(influctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ campaign_names | safe }},
+                        datasets: [{
+                            label: "Earnings per Campaign",
+                            data: {{ earnings_data | safe }},
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        parsing: {
+                            key: 'value'
+                        },
+                    }
+                });
+            }
+        {% endif %}
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+{% block content %}
+<form action="{{url_for('register')}}" method='POST'>
+                    <h1 align="center">Register</h1>
+                    <div class="mb-3">
+                        <label for="register-email" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="register-email" placeholder="username" name="reg_email" >
+                    </div>
+
+                    
+                    <div class="mb-3">
+                        <label for="register-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="register-password" placeholder="password" name="password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="register-confirm" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="register-confirm" placeholder="password" name="confirm">
+                    </div>
+                    <div class="mb-3">
+                        <label for="register-role" class="form-label">Role</label>
+                        <select name="role" class="form-control"  id="register-role" placeholder="choose your role">
+                            <option value="User">Simple User</option>
+                            <option value="Sponsor">Sponsor</option>
+                            <option value="Influencer">Influencer</option>
+                          </select>
+                    </div>
+                    <div style="text-align:center">
+                        <input type="submit" class="btn btn-primary" value="Register">
+                    </div>
+                </form>
+            
+                <div style="text-align:center">
+                    <br><br>Already registered? <a href="/login">Go to Login.</a></p>
+                </div>
+            {% endblock %} 

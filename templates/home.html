@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h1>Hi {{user.username}}</h1>
+{% if user.role=='Influencer' %}
+  {% include 'Influencer/influendash.html' %}
+  
+{% elif user.role=="Sponsor" %}
+  {% include 'Sponsor/spondash.html' %}
+  
+{% elif user.role=="Admin" %}
+  <h1>hi admin</h1>
+  {% include 'Admin/admindash.html' %}
+
+{% else %} 
+  <h1>hi {{user.username}}</h1>
+
+  
+{% endif %}
+{% endblock %}
+    
+      

@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block content %}
+<form action="{{url_for('spo_register',user_id=user.id)}}" method='POST'>
+                    <h1 align="center"> Sponsor Register</h1>
+                    <div class="mb-3">
+                        <label for="spo-name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="spo-name" placeholder="Company/Individual Name" name="spo-name" >
+                    </div>
+
+                    
+                    <div class="mb-3">
+                        <label for="industry" class="form-label">Industry</label>
+                        <input type="text" class="form-control" id="industry" placeholder="Industry" name="industry">
+                    </div>
+                    <div class="mb-3">
+                        <label for="budget" class="form-label">Budget</label>
+                        <input type="text" class="form-control" id="budget" placeholder="Budget of the company" name="budget">
+                    </div>
+                    <div style="text-align:center">
+                        <input type="submit" class="btn btn-primary" value="Register">
+                    </div>
+                </form>
+            
+                <div style="text-align:center">
+                    <br><br>Already registered? <a href="/login">Go to Login.</a></p>
+                </div>
+            {% endblock %} 

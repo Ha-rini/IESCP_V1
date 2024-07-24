@@ -1,0 +1,72 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h3>List of Active Users</h3>
+    <hr>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for user in notflag_users %}
+      <tr>
+        <td>{{user.id}}</td>
+        <td>{{user.username}}</td>
+        <td>{{user.role}}</td>
+        <td>
+            {% if not user.is_admin %}
+                <form action="{{url_for('flag_user',id=user.id)}}" method="POST">
+                    <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                </form>
+            {% else %}
+                <p><b>Cannot flag admin.</b></p>
+            {% endif %}
+            
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h3>List of Flagged Users</h3>
+<hr>
+{% if flag_users | length == 0 %}
+        <h5>No Flagged users</h5>
+            
+{% else %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for user in flag_users %}
+      <tr>
+        <td>{{user.id}}</td>
+        <td>{{user.username}}</td>
+        <td>{{user.role}}</td>
+        <td>
+            {% if not user.is_admin %}
+                <form action="{{url_for('unflag_user',id=user.id)}}" method="POST">
+                    <button class="btn btn-danger" type="submit"><i class="fa fa-flag-checkered" aria-hidden="true"></i> Unflag</button>
+                </form>
+            {% endif %}
+            
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+{% endblock %}

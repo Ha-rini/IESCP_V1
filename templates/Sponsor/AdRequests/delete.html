@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>Delete Ad Request</h1>
+    <h2>Details:</h2>
+    <h6>Campaign Name: {{campaign.camp_name}}</h6>
+    <h6>Influencer: {{adreq.influencer.name}}</h6>
+    <h6>Requirements: {{adreq.requirements}}</h6>
+    <h6>Payment Amount: {{adreq.pay_amt}}</h6>
+    <h6>Status: {{adreq.status}}</h6>
+    <hr>
+    Are you sure you want to delete this campaign?<br><br>
+    <form action="{{url_for('delete_adreq',id=campaign.id,ad_id=adreq.id)}}" method="post">
+        <button type="submit" class="btn btn-danger">
+            <i class="fa fa-trash" aria-hidden="true"></i>
+            Confirm Delete
+        </button>
+        <a href="{{url_for('adreqs_list',id=campaign.id)}}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

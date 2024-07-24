@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+    {% block content %}
+
+    <h1>Search</h1>
+    <form class="d-flex" role="search" action="{{url_for('search_campaign')}}">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" {% if query %}
+        value="{{query}}"
+        {% endif %}>
+        <button class="btn btn-outline-success" type="submit">
+            Search
+        </button>
+    </form>
+    <br>
+    {% if not query %}
+    <br>
+        <h2>Campaigns</h2>
+        {% if all_campaigns | length == 0 %}
+        <h5>No Public campaigns available</h5>
+        {% else %}
+        <div id="trans-table">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Campaign Name</th>                    
+                    <th scope="col">Start date</th>
+                    <th scope="col">End date</th>                    
+                    <th scope="col">Description</th>
+                    <th scope="col">Request</th>               
+                </tr>
+                </thead>
+                <tbody>
+                    {% for c in all_campaigns %}
+                    <tr>
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{c.camp_name}} </td>
+                        <td>{{c.start_date}}</td>                    
+                        <td>{{c.end_date}}</td>                        
+                        <td>{{c.description}}</td>
+                        <td>
+                            <form action="{{url_for('request_adreq',id=c.id)}}">
+                                <button class="btn btn-primary" type="submit">Request</button>
+                            </form>
+                        </td>
+                    </tr>
+            
+        {% endfor %}
+        
+        {% endif %}
+    {% else %}
+    <h2>Campaigns</h2>
+    <br>
+        {% if campaigns %}
+        <div id="trans-table">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Campaign Name</th>                    
+                    <th scope="col">Start date</th>
+                    <th scope="col">End date</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Request</th>               
+                </tr>
+                </thead>
+                <tbody>
+            {% for c in campaigns %}
+            <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{c.camp_name}} </td>
+                <td>{{c.start_date}}</td>                    
+                <td>{{c.end_date}}</td>
+                <td>{{c.description}}</td>
+                <td>
+                    <form action="{{url_for('request_adreq',id=c.id)}}" method="POST">
+                        <button class="btn btn-primary" type="submit">Request</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <h2>No campaigns matches found.</h2>
+        {% endif %}           
+    {% endif %}
+
+{% endblock %}
