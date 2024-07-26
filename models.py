@@ -52,6 +52,7 @@ class Campaign(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     camp_name=db.Column(db.String(32),nullable=False,unique=True)
     description=db.Column(db.String(256))
+    niche=db.Column(db.String(256))
     budget=db.Column(db.Integer,nullable=False)
     start_date=db.Column(db.Date,nullable=False)
     end_date=db.Column(db.Date,nullable=False)

@@ -27,6 +27,7 @@
                     <th scope="col">Start date</th>
                     <th scope="col">End date</th>                    
                     <th scope="col">Description</th>
+                    <th scope="col">Niche</th>
                     <th scope="col">Request</th>               
                 </tr>
                 </thead>
@@ -38,6 +39,7 @@
                         <td>{{c.start_date}}</td>                    
                         <td>{{c.end_date}}</td>                        
                         <td>{{c.description}}</td>
+                        <td>{{c.niche}}</td>
                         <td>
                             <form action="{{url_for('request_adreq',id=c.id)}}">
                                 <button class="btn btn-primary" type="submit">Request</button>
@@ -61,7 +63,8 @@
                     <th scope="col">Start date</th>
                     <th scope="col">End date</th>
                     <th scope="col">Description</th>
-                    <th scope="col">Request</th>               
+                    <th scope="col">Niche</th>
+                    <th scope="col">Request</th>              
                 </tr>
                 </thead>
                 <tbody>
@@ -72,6 +75,7 @@
                 <td>{{c.start_date}}</td>                    
                 <td>{{c.end_date}}</td>
                 <td>{{c.description}}</td>
+                <td>{{c.niche}}</td>
                 <td>
                     <form action="{{url_for('request_adreq',id=c.id)}}" method="POST">
                         <button class="btn btn-primary" type="submit">Request</button>

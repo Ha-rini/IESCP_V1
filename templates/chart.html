@@ -23,11 +23,14 @@
             <canvas id="spoChart1"></canvas>
             <canvas id="spoChart2"></canvas>
         </div>
-    {% elif user.role=="Admin" %}
+    {% elif user.role == "Admin" %}
         <div class="chart-container">
             <canvas id="adminChart1"></canvas>
             <canvas id="adminChart2"></canvas>
+        </div>
+        <div class="div chart-container">
             <canvas id="adminChart3"></canvas>
+            <canvas id="adminChart4"></canvas>
         </div>
     {% else %}
         <h5>No Stats for you :/</h5>
@@ -38,19 +41,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
 
-        {% if user.role == 'Admin' %}
+        {% if (user.role == 'Admin') %}
         const adminctx1 = document.getElementById('adminChart1');
         const adminctx2 = document.getElementById('adminChart2');
         const adminctx3 = document.getElementById('adminChart3');
+        const adminctx4 = document.getElementById('adminChart4');
         if (adminctx1) {
             new Chart(adminctx1, {
                 type: 'doughnut',
             data: {
                 
                 datasets: [{
-                    data: [{id: 'Active Users', value: '{{notflag_users | length }}' }, {id: 'Flagged Users', value: '{{flag_users | length }}' }]
+                    data: [{{ notflag_users | length }}, {{ flag_users | length }}],
                     }],
                     labels: [
                     'Active Users',
@@ -60,11 +63,12 @@
             },
             
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 parsing: {
-                key: 'value'
+                    key: 'value'
                 },
-                radius: "40%",
-                }
+            }
             });   
         }
         if (adminctx2) {
@@ -73,7 +77,7 @@
             data: {
                 
                 datasets: [{
-                    data: [{id: 'Active Campaigns', value: '{{notflag_campaigns | length }}' }, {id: 'Flagged Campaigns', value: '{{flag_campaigns | length }}' }]
+                    data:  [{{ notflag_campaigns | length }}, {{ flag_campaigns | length }}],
                     }],
                     labels: [
                     'Active Campaigns',
@@ -82,11 +86,12 @@
             },
             
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 parsing: {
-                key: 'value'
+                    key: 'value'
                 },
-                radius: "40%",
-                }
+            }
             });
             
         }
@@ -103,10 +108,12 @@
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(255, 159, 64, 0.2)',
+                'rgba(75, 192, 192, 0.2)'
             ],
             borderColor: [
                 'rgb(255, 99, 132)',
                 'rgb(255, 159, 64)',
+                'rgb(75, 192, 192)'
             ],
             borderWidth: 1
             }]
@@ -125,9 +132,45 @@
             new Chart(adminctx3,config);
             
         }
+        if (adminctx4){
+            new Chart(adminctx4, {
+                type: 'bar',
+                data: {
+                    labels: ["Pending", "Requested", "Accepted", "Rejected", "Completed"],
+                    datasets: [{
+                        label: 'Status of Campaigns',
+                        data: {{ data_counts | safe }},
+                        backgroundColor: [
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
     {% endif %}
     
-        {% if user.role == 'Sponsor' %}
+        {% if (user.role == 'Sponsor') %}
             const spoctx1 = document.getElementById('spoChart1');
             const spoctx2 = document.getElementById('spoChart2');
 
@@ -189,7 +232,7 @@
             }
         {% endif %}
 
-        {% if user.role == 'Influencer' %}
+        {% if (user.role == 'Influencer') %}
             const influctx1 = document.getElementById('influChart1');
             const influctx2 = document.getElementById('influChart2');
 
@@ -263,6 +306,6 @@
                 });
             }
         {% endif %}
-    });
+    ;
 </script>
 {% endblock %}

@@ -189,7 +189,8 @@ def home():
             return redirect(url_for('login'))
         users=User.query.all()
         campaigns=Campaign.query.all()
-        return render_template("Admin/admindash.html",users=users,campaigns=campaigns)
+        adreqs=AdRequest.query.all()
+        return render_template("Admin/admindash.html",users=users,campaigns=campaigns,adreqs=adreqs)
     else:
         return render_template("home.html",user=user)
 
@@ -217,6 +218,12 @@ def search_campaign():
             Campaign.is_flagged == False,
             Campaign.visibility == "Public"
         ).all()
+         campaigns.extend(Campaign.query.filter(
+            Campaign.niche.ilike(f'%{query}%'),
+            Campaign.is_flagged == False,
+            Campaign.visibility == "Public"
+        ).all())
+         print(campaigns)
     return render_template('Influencer/search.html',query=query,all_campaigns=all_campaigns, campaigns=campaigns)
 
 @app.route('/sponsorsearch')
@@ -376,6 +383,7 @@ def add_campaign_post(id):
     start_date=request.form.get("start-date")
     end_date=request.form.get("end-date")
     budget=request.form.get("budget")
+    niche=request.form.get("camp-niche")
     desc=request.form.get("camp-desc")
     goals=request.form.get("camp-goal")
     visibility=request.form.get("camp-visibility")
@@ -406,7 +414,7 @@ def add_campaign_post(id):
     if end_date < start_date:
         flash("End Date cannot be before Start Date",category="danger")
         return redirect(url_for('add_campaign'))
-    campaign=Campaign(camp_name=name,description=desc,start_date=start_date,end_date=end_date,budget=budget,visibility=visibility,goals=goals,sponsor=sponsor)
+    campaign=Campaign(camp_name=name,description=desc,start_date=start_date,end_date=end_date,niche=niche,budget=budget,visibility=visibility,goals=goals,sponsor=sponsor)
     db.session.add(campaign)
     db.session.commit()
     flash("Campaign added successfully",category="success")
@@ -426,6 +434,7 @@ def edit_campaign(id):
         start_date=request.form.get("start-date")
         end_date=request.form.get("end-date")
         budget=request.form.get("budget")
+        niche=request.form.get("camp-niche")
         desc=request.form.get("camp-desc")
         goals=request.form.get("camp-goal")
         visibility=request.form.get("camp-visibility")
@@ -455,6 +464,7 @@ def edit_campaign(id):
         
         campaign.camp_name=name
         campaign.budget=budget
+        campaign.niche=niche
         campaign.start_date=start_date
         campaign.end_date=end_date
         campaign.goals=goals
@@ -694,11 +704,6 @@ def unflag_campaign(id):
     return redirect(url_for('campaign_list'))
 
 
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
 @app.route('/logout')
 def logout():
     session.pop('username')
@@ -745,23 +750,30 @@ def stats():
 
         campaign_names = list(earnings_data.keys())
         earnings_data = list(earnings_data.values())
-        
         return render_template("chart.html",user=user,influencer=influencer,adreqs=adreqs,data_counts=data_counts,earnings_data=earnings_data,campaign_names=campaign_names)
+    
     elif user.role=="Admin":
         if not user:
             flash("You need to login first",category="danger")
             return redirect(url_for('login'))
-        print(user.role)
-        user=User.query.all()
+        users=User.query.all()
         campaigns=Campaign.query.all()
         notflag_users = User.query.filter_by(is_flagged=False).all()
         flag_users=User.query.filter_by(is_flagged=True).all()
         notflag_campaigns = Campaign.query.filter_by(is_flagged=False).all()
         flag_campaigns=Campaign.query.filter_by(is_flagged=True).all()
         sponsors=Sponsor.query.all()
-        return render_template('chart.html',user=user,campaigns=campaigns,flag_users=flag_users,
+        adreqs=AdRequest.query.all()
+        statuses = ["pending", "requested", "accepted", "rejected", "completed"]
+        status_counts = Counter() 
+        for adreq in adreqs:
+            if adreq.status in statuses:
+                status_counts[adreq.status] += 1
+        data_counts = [status_counts[status] for status in statuses]
+        print(data_counts)
+        return render_template('chart.html',user=user,users=users,campaigns=campaigns,flag_users=flag_users,
                                notflag_users=notflag_users,notflag_campaigns=notflag_campaigns,
-                               flag_campaigns=flag_campaigns,sponsors=sponsors)
+                               flag_campaigns=flag_campaigns,sponsors=sponsors,data_counts=data_counts)
     return render_template('/chart.html')
     
 @app.route('/users/<int:id>/delete',methods=["POST"])
