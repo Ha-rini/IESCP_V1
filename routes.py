@@ -213,17 +213,18 @@ def search_campaign():
     campaigns=None
     all_campaigns=Campaign.query.filter_by(is_flagged=0,visibility="Public").all()
     if query:
-         campaigns = Campaign.query.filter(
+        campaigns = Campaign.query.filter(
             Campaign.camp_name.ilike(f'%{query}%'),
             Campaign.is_flagged == False,
             Campaign.visibility == "Public"
         ).all()
-         campaigns.extend(Campaign.query.filter(
+        campaigns.extend(Campaign.query.filter(
             Campaign.niche.ilike(f'%{query}%'),
             Campaign.is_flagged == False,
             Campaign.visibility == "Public"
         ).all())
-         print(campaigns)
+        campaigns=list(set(campaigns))
+        print(campaigns)
     return render_template('Influencer/search.html',query=query,all_campaigns=all_campaigns, campaigns=campaigns)
 
 @app.route('/sponsorsearch')
@@ -244,10 +245,32 @@ def sponsor_search():
                     join(Sponsor.user).
                     filter(Campaign.camp_name.ilike(f'%{query}%'),
                            Campaign.is_flagged==0,User.id==user.id)).all()
+        campaigns.extend(Campaign.query.filter(
+            Campaign.niche.ilike(f'%{query}%'),
+            Campaign.is_flagged == False,
+            Campaign.visibility == "Public"
+        ).all())
         influencers=Influencer.query.join(Influencer.user).filter(
                         Influencer.name.ilike(f'%{query}%'),
                         User.is_flagged==False
                     ).all()
+        influencers.extend(Influencer.query.join(Influencer.user).filter(
+                        Influencer.niche.ilike(f'%{query}%'),
+                        User.is_flagged==False
+                    ).all()
+                    )
+        influencers.extend(Influencer.query.join(Influencer.user).filter(
+                        Influencer.reach.ilike(f'%{query}%'),
+                        User.is_flagged==False
+                    ).all()
+                    )
+        influencers.extend(Influencer.query.join(Influencer.user).filter(
+                        Influencer.category.ilike(f'%{query}%'),
+                        User.is_flagged==False
+                    ).all()
+                    )
+        campaigns=list(set(campaigns))
+        influencers=list(set(influencers))
     return render_template('Sponsor/search.html',query=query,all_campaigns=all_campaigns, campaigns=campaigns,all_influencers=all_influencers,influencers=influencers)
 
 @app.route('/adminsearch')
@@ -260,8 +283,12 @@ def admin_search():
     all_campaigns=Campaign.query.all()
     if query:
         campaigns=Campaign.query.filter(Campaign.camp_name.ilike(f'%{query}%')).all()
+        campaigns.extend(Campaign.query.filter(
+            Campaign.niche.ilike(f'%{query}%')
+        ).all())
         users=User.query.filter(User.username.ilike(f'%{query}%')).all()
         print(users, campaigns)
+        campaigns=list(set(campaigns))
     return render_template('Admin/search.html',query=query,all_users=all_users,all_campaigns=all_campaigns,users=users,campaigns=campaigns)
 
 @app.route('/searchinfluencer/<int:id>')
@@ -276,6 +303,23 @@ def search_influencer(id):
                         Influencer.name.ilike(f'%{query}%'),
                         User.is_flagged==False
                     ).all()
+        influencers.extend(Influencer.query.join(Influencer.user).filter(
+                        Influencer.niche.ilike(f'%{query}%'),
+                        User.is_flagged==False
+                    ).all()
+                    )
+        influencers.extend(Influencer.query.join(Influencer.user).filter(
+                        Influencer.reach.ilike(f'%{query}%'),
+                        User.is_flagged==False
+                    ).all()
+                    )
+        influencers.extend(Influencer.query.join(Influencer.user).filter(
+                        Influencer.category.ilike(f'%{query}%'),
+                        User.is_flagged==False
+                    ).all()
+                    )
+        influencers=list(set(influencers))
+        print(influencers)
     return render_template('Sponsor/search_influencer.html',query=query,
                            all_influencers=all_influencers,influencers=influencers,id=id)
 

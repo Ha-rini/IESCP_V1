@@ -15,7 +15,8 @@ class User(db.Model):
     role=db.Column(db.String(16),default="User")
     is_flagged=db.Column(db.Boolean,default=False,nullable=False)
     is_admin=db.Column(db.Boolean,default=False,nullable=False)
-
+    profile_pic=db.Column(db.String,nullable=False,default="default_pic.jpg")
+    
     sponsors=db.relationship('Sponsor',backref="user",lazy=True,cascade='all,delete-orphan')
     influencers=db.relationship('Influencer',backref="user",lazy=True,cascade='all,delete-orphan')
     
@@ -41,7 +42,6 @@ class Influencer(db.Model):
     category=db.Column(db.String(256),nullable=False)
     platform=db.Column(db.String(64))
     user_id=db.Column(db.Integer,db.ForeignKey("user.id"))
-    profile_pic=db.Column(db.String,nullable=False,default="default_pic.jpg")
     about=db.Column(db.String,nullable=True)
 
     adreqs=db.relationship("AdRequest",backref="influencer", lazy=True,cascade='all,delete-orphan')
