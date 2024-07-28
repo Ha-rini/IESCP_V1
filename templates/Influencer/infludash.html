@@ -31,12 +31,56 @@
             <td>
               <a href="{{url_for('accept_adreq',ad_id=a.id)}}" type="button" class="btn btn-success">Accept</a>
               <a href="{{url_for('reject_adreq',ad_id=a.id)}}" type="button" class="btn btn-danger">Reject</a>
-              <a href="#" type="button" class="btn btn-secondary">Send Message</a>
             </td>
           </tr>
           {% endfor %}
         </tbody>
     </table>
+</div>
+{% endif %}
+<hr>
+</div>
+<br>
+<div id="trans-table">                         
+  <h4 class="headings" style="margin-top: 15px">Active Ad Requests</h4>
+  <hr>
+  {% if accepted_adreqs|length == 0 %}
+  <h6>No Active Ad Requests</h6>
+  {% else %}
+  <div id="trans-table" style="margin: 10px;">
+  <table class="table">
+      <thead>
+      <tr>
+          <th scope="col">#</th>                        
+          <th scope="col">Campaign Name</th>                    
+          <th scope="col">Requirements</th>
+          <th scope="col">Payment Amount</th>                        
+          <th scope="col">Messages</th>
+          <th scope="col">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for a in accepted_adreqs %}
+        <tr>
+          <td scope="row">{{loop.index}}</td>                    
+          <td>{{a.campaign.camp_name}} </td> 
+          <td>{{a.requirements}}</td>
+          <td>{{a.pay_amt}}</td>
+          <td>{{a.messages.meesage_body}}</td>  
+          <td>
+            {% if a.status == "completed" %}
+              Request Completed
+            {% else %}
+            <form action="{{url_for('complete_adreq',ad_id=a.id)}}" method="post">
+              <button type="submit" class="btn btn-success">Mark as Complete</button>
+            </form> 
+            {% endif %}
+            
+          </td>              
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
 </div>
 {% endif %}
 <hr>
@@ -68,10 +112,11 @@
           <td>{{a.campaign.camp_name}} </td> 
           <td>{{a.requirements}}</td>
           <td>{{a.pay_amt}}</td>
-          <td>{{a.messages.meesage_body}}</td>                
+          <td>{{a.messages.meesage_body}}</td> 
           <td>
-            <a href="#" type="button" class="btn btn-secondary">Send Message</a>
-          </td>
+            <a href="{{url_for('edit_request_adreq',id=a.campaign.id,ad_id=a.id)}}" type="button" class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+            <a href="{{url_for('delete_request_adreq',id=a.campaign.id,ad_id=a.id)}}" type="button" class="btn btn-danger" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>                        
+          </td>              
         </tr>
         {% endfor %}
       </tbody>
@@ -122,38 +167,4 @@
 </div>
 <br>
 
-<div id="trans-table">                         
-  <h4 class="headings" style="margin-top: 15px">Active Campaigns</h4>
-  <hr>
-  {% if accepted_adreqs|length == 0 %}
-  <h6>No Active Campaigns</h6>
-  {% else %}
-  <div id="trans-table" style="margin: 10px;">
-  <table class="table">
-      <thead>
-      <tr>
-          <th scope="col">#</th>                        
-          <th scope="col">Campaign Name</th>                    
-          <th scope="col">Requirements</th>
-          <th scope="col">Payment Amount</th>                        
-          <th scope="col">Messages</th>
-      </tr>
-      </thead>
-      <tbody>
-        {% for a in accepted_adreqs %}
-        <tr>
-          <td scope="row">{{loop.index}}</td>                    
-          <td>{{a.campaign.camp_name}} </td> 
-          <td>{{a.requirements}}</td>
-          <td>{{a.pay_amt}}</td>
-          <td>{{a.messages.meesage_body}}</td>                
-        </tr>
-        {% endfor %}
-      </tbody>
-  </table>
-</div>
-{% endif %}
-<hr>
-</div>
-<br>
 {% endblock %}

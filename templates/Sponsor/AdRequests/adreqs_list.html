@@ -3,12 +3,58 @@
 {% block content %}
 
 
-<h4 class="headings">Ad Requests</h4>
+<h4 class="headings">Ad Requests Created</h4>
     <div id="trans-table">
         <a type="button" href="{{url_for('add_adreq',id=campaign.id)}}"><button class="btn btn-primary">Create +</button></a>
     </div>
     <hr>
-    {% if campaign.adreqs|length == 0 %}
+    {% if other_adreqs|length == 0 %}
+    <h6>No Ads</h6>
+    {% else %}
+    <div id="trans-table">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Influencer Name</th>                    
+                <th scope="col">Campaign Name</th>                    
+                <th scope="col">Requirements</th>
+                <th scope="col">Payment Amount</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>     
+                                    
+            </tr>
+            </thead>
+            <tbody>
+                {% for a in other_adreqs %}
+                <tr>
+                    <th scope="row">{{loop.index}}</th>
+                    <td>{{a.influencer.name}}</td>
+                    <td>{{a.campaign.camp_name}} </td> 
+                    <td>{{a.requirements}}</td>
+                    <td>{{a.pay_amt}}</td>
+                    <td>{{a.status}}</td>                            
+                    <td>
+                        {% if a.status != "completed" %}
+                        <a href="{{url_for('edit_adreq',id=campaign.id,ad_id=a.id)}}" type="button" class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+                        <a href="{{url_for('delete_adreq',id=campaign.id,ad_id=a.id)}}" type="button" class="btn btn-danger" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>                        
+                        {% else %}
+                        <p><b>No actions can be performed.</b></p>
+                        {% endif %}
+                        
+                    </td>
+                </tr> 
+                {% endfor %}                 
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <hr>
+    <br>
+    <h4 class="headings">Requests from Influencers</h4>
+    <hr>
+    {% if req_adreqs|length == 0 %}
     <h6>No Ads</h6>
     {% else %}
     <div id="trans-table">
@@ -35,15 +81,8 @@
                     <td>{{a.pay_amt}}</td>
                     <td>{{a.status}}</td>                            
                     <td>
-                        {% if a.status != "completed" %}
-                        <a href="{{url_for('edit_adreq',id=campaign.id,ad_id=a.id)}}" type="button" class="btn btn-success"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-                        <a href="{{url_for('delete_adreq',id=campaign.id,ad_id=a.id)}}" type="button" class="btn btn-danger" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
-                        <a href="#" type="button" class="btn btn-secondary" style="margin: 5px;"><i class="fa fa-envelope" aria-hidden="true"></i> Send Message</a>
-                        
-                        {% else %}
-                        <p><b>No actions can be performed.</b></p>
-                        {% endif %}
-                        
+                        <a href="{{url_for('accept_adreq_from_influencer',ad_id=a.id)}}" type="button" class="btn btn-success">Accept</a>
+                        <a href="{{url_for('reject_adreq_from_influencer',ad_id=a.id)}}" type="button" class="btn btn-danger" >Reject</a>                        
                     </td>
                 </tr> 
                 {% endfor %}                 
@@ -51,8 +90,7 @@
         </table>
     </div>
     {% endif %}
-    <hr>
-    <br>
+    
     <h4 class="headings">Messages from Influencers</h4>
     <hr>
     {% if modf_ads|length == 0 %}

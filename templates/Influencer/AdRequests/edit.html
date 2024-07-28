@@ -1,34 +1,34 @@
 {% extends 'layout.html' %}
 {% block content %}
     
-            <form action="{{url_for('request_adreq',id=campaign.id)}}" method="POST">
+            <form action="{{url_for('edit_request_adreq',id=campaign.id,ad_id=adreq.id)}}" method="POST">
               <div  id="new-box">
               <h5 align="center">New Ad Request</h5>
                 <div class="mb-3">
                   <label for="infu-name" class="form-label">Influencer Name</label>
-                  <input type="text" class="form-control" id="influ-name" placeholder="Influencer Name" name="influ-name" value="{{influencer.name}}" readonly>
+                  <input type="text" class="form-control" id="influ-name" placeholder="Influencer Name" name="influ-name" value="{{adreq.influencer.name}}" readonly>
                 </div>
                 <div class="mb-3">
                   <label for="camp-name" class="form-label">Campaign Name</label>
-                  <input type="text" class="form-control" id="camp-name" placeholder="Campaign Name" name="camp-name" value="{{campaign.camp_name}}" readonly>
+                  <input type="text" class="form-control" id="camp-name" placeholder="Campaign Name" name="camp-name" value="{{adreq.campaign.camp_name}}" readonly>
                 </div>
                 <div class="mb-3">
                   <label for="requirements" class="form-label">Requirements</label>
-                  <input type="text" class="form-control" id="requirements" placeholder="requirements to be fulfilles by you" name="requirements" >
+                  <input type="text" class="form-control" id="requirements" placeholder="requirements to be fulfilles by you" name="requirements" value="{{adreq.requirements}}">
                 </div>
                 <div class="mb-3">
                     <label for="message" class="form-label">Message</label>
-                    <input type="text" class="form-control" id="message" placeholder="Message sent to sponsor" name="message" >
+                    <input type="text" class="form-control" id="message" placeholder="Message sent to sponsor" name="message" value="message">
                 </div>
                 
                 <div class="mb-3">
                   <label for="amt" class="form-label">Payment Amount</label>
-                  <input type="number" class="form-control" id="amt" placeholder="Payment for the influencer" name="amt" >
+                  <input type="number" class="form-control" id="amt" placeholder="Payment for the influencer" name="amt" value="{{adreq.pay_amt}}">
                 </div>      
 
                 <div style="text-align:center;padding: 50px;">
                   <a href="{{url_for('home')}}"><button type="button" class="btn btn-danger">Cancel</button></a>                   
-                  <button type="submit" class="btn btn-primary">Request</button>
+                  <button type="submit" class="btn btn-primary">Edit</button>
               </div>
             </div>
           </form>

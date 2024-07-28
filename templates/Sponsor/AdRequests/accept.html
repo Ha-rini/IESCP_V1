@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>Accept Ad Request</h3>
+    <h3>Details:</h2>
+    <p>Campaign Name: {{a.campaign.camp_name}}</p>
+    <p>Requirements: {{a.requirements}}</p>
+    <p>Payment Amount: {{a.pay_amt}}</p>
+    <p>Influencer: {{a.influencer.name}}</p>
+    <hr>
+    Are you sure you want to accept this ad request?<br><br>
+    <form action="{{url_for('accept_adreq_from_influencer',ad_id=a.id)}}" method="post">
+        <button type="submit" class="btn btn-success">
+            Accept
+        </button>
+        <a href="{{url_for('adreqs_list',id=a.campaign.id)}}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

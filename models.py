@@ -2,8 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 from app import app
 from werkzeug.security import generate_password_hash
 from datetime import datetime
+from flask_migrate import Migrate
+from flask_wtf.file import FileField, FileAllowed
 
 db=SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 #models
 
@@ -61,6 +64,7 @@ class Campaign(db.Model):
     spo_id=db.Column(db.Integer,db.ForeignKey("sponsor.id"))
     is_flagged=db.Column(db.Boolean,default=False,nullable=False)
     status=db.Column(db.String(32),default="active") #[active,completed,progress(?)]
+    progress=db.Column(db.Integer,nullable=False,default=0)
 
     adreqs=db.relationship("AdRequest",backref="campaign", lazy=True,cascade='all,delete-orphan')
 
@@ -70,7 +74,7 @@ class AdRequest(db.Model):
     influ_id=db.Column(db.Integer,db.ForeignKey("influencer.id"))
     camp_id=db.Column(db.Integer,db.ForeignKey("campaign.id"))
     #messages=db.Column(db.String(256))
-    requirements=db.Column(db.String(256),default="to be written by sponsor")
+    requirements=db.Column(db.String(256),nullable=False)
     pay_amt=db.Column(db.Integer,nullable=False)
     status=db.Column(db.String(32),default="pending") #[pending, accepted, rejected, requested, completed, messaged]
 

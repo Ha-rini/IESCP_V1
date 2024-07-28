@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 
 app=Flask(__name__)
 
+
 import config
 
 import models
