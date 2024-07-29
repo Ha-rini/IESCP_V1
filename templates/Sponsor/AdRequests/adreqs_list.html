@@ -49,9 +49,9 @@
         </table>
     </div>
     {% endif %}
-
     <hr>
     <br>
+
     <h4 class="headings">Requests from Influencers</h4>
     <hr>
     {% if req_adreqs|length == 0 %}
@@ -72,7 +72,7 @@
             </tr>
             </thead>
             <tbody>
-                {% for a in campaign.adreqs %}
+                {% for a in req_adreqs %}
                 <tr>
                     <th scope="row">{{loop.index}}</th>
                     <td>{{a.influencer.name}}</td>
@@ -90,7 +90,44 @@
         </table>
     </div>
     {% endif %}
-    
+    <hr>
+    <br>
+
+    <h4 class="headings">Completed Ad Requests</h4>
+    <hr>
+    {% if completed_adreqs|length == 0 %}
+    <h6>No Ads Completed</h6>
+    {% else %}
+    <div id="trans-table">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Influencer Name</th>                    
+                <th scope="col">Campaign Name</th>                    
+                <th scope="col">Requirements</th>
+                <th scope="col">Payment Amount</th>
+                <th scope="col">Status</th>                   
+            </tr>
+            </thead>
+            <tbody>
+                {% for a in completed_adreqs %}
+                <tr>
+                    <th scope="row">{{loop.index}}</th>
+                    <td>{{a.influencer.name}}</td>
+                    <td>{{a.campaign.camp_name}} </td> 
+                    <td>{{a.requirements}}</td>
+                    <td>{{a.pay_amt}}</td>
+                    <td>{{a.status}}</td>                            
+                </tr> 
+                {% endfor %}                 
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    <hr>
+    <br>
+
     <h4 class="headings">Messages from Influencers</h4>
     <hr>
     {% if modf_ads|length == 0 %}

@@ -5,7 +5,10 @@ from functools import wraps
 from datetime import datetime
 from collections import Counter, defaultdict
 from sqlalchemy import or_,and_
-from flask_wtf.file import FileField, FileAllowed
+from imghdr import what
+import os
+
+from werkzeug.utils import secure_filename
 
 from app import app
 
@@ -180,11 +183,30 @@ def home():
         if not influencer:
             flash("You need to login first",category="danger")
             return redirect(url_for('login'))
-        pending_adreqs = AdRequest.query.filter_by(influ_id=influencer.id, status="pending").all()
-        accepted_adreqs = AdRequest.query.filter_by(influ_id=influencer.id, status="accepted").all()
-        requested_adreqs = AdRequest.query.filter_by(influ_id=influencer.id, status="requested").all()
+        pending_adreqs = AdRequest.query.join(Campaign, AdRequest.camp_id == Campaign.id).filter(
+                            AdRequest.influ_id == influencer.id,
+                            AdRequest.status == "pending",
+                            Campaign.is_flagged == False
+                        ).all()
+        accepted_adreqs = AdRequest.query.join(Campaign, AdRequest.camp_id == Campaign.id).filter(
+                            AdRequest.influ_id == influencer.id,
+                            AdRequest.status == "accepted",
+                            Campaign.is_flagged == False
+                        ).all()
+        requested_adreqs = AdRequest.query.join(Campaign, AdRequest.camp_id == Campaign.id).filter(
+                            AdRequest.influ_id == influencer.id,
+                            AdRequest.status == "requested",
+                            Campaign.is_flagged == False
+                        ).all()
+        completed_adreqs = AdRequest.query.join(Campaign, AdRequest.camp_id == Campaign.id).filter(
+                            AdRequest.influ_id == influencer.id,
+                            AdRequest.status == "completed",
+                            Campaign.is_flagged == False
+                        ).all()
         print(accepted_adreqs)
-        return render_template("Influencer/infludash.html",influencer=influencer,pending_adreqs=pending_adreqs,accepted_adreqs=accepted_adreqs,requested_adreqs=requested_adreqs)
+        return render_template("Influencer/infludash.html",influencer=influencer,pending_adreqs=pending_adreqs,
+                               accepted_adreqs=accepted_adreqs,requested_adreqs=requested_adreqs,
+                               completed_adreqs=completed_adreqs)
     elif user.role=="Admin":
         if not user.is_admin:
             flash("You need to login first",category="danger")
@@ -670,11 +692,14 @@ def adreqs_list(id):
         flash("Campaign doesn't exist",category="danger")
         return redirect(url_for('home'))
     req_adreqs=AdRequest.query.filter_by(camp_id=campaign.id,status="requested").all()
+    completed_adreqs=AdRequest.query.filter_by(camp_id=campaign.id,status="completed").all()
     other_adreqs=AdRequest.query.filter(
     AdRequest.camp_id == campaign.id,
-    AdRequest.status != "requested"
+    AdRequest.status.notin_(["requested", "completed"])
 ).all()
-    return render_template('Sponsor/AdRequests/adreqs_list.html',campaign=campaign,req_adreqs=req_adreqs,other_adreqs=other_adreqs)
+    return render_template('Sponsor/AdRequests/adreqs_list.html',campaign=campaign,
+                           req_adreqs=req_adreqs,other_adreqs=other_adreqs,
+                           completed_adreqs=completed_adreqs)
 
 @app.route('/campaign/adrequest/add/<int:id>',methods=['GET','POST'])
 @check_session
@@ -947,16 +972,27 @@ def profile():
     if user.role=="Influencer":
         influencer=Influencer.query.filter_by(user_id=user.id).first()
         profile_pic=url_for('static',filename='profile_pics/' + user.profile_pic)
-        return render_template('profile.html',user=user,influencer=influencer,profile_pic=profile_pic)
+        adreqs=(AdRequest.query
+                .join(Influencer, AdRequest.influ_id == Influencer.id)
+                .join(Campaign, AdRequest.camp_id == Campaign.id)
+                .filter(AdRequest.status.in_(["completed", "accepted"]),Influencer.id==influencer.id)
+                .all())
+        print(adreqs)
+        return render_template('profile.html',user=user,influencer=influencer,
+                               profile_pic=profile_pic,adreqs=adreqs)
     if user.role=="Sponsor":
         sponsor=Sponsor.query.filter_by(user_id=user.id).first()
-        return render_template('profile.html',user=user,sponsor=sponsor)
+        profile_pic=url_for('static',filename='profile_pics/' + user.profile_pic)
+        print(profile_pic)
+        return render_template('profile.html',user=user,sponsor=sponsor,profile_pic=profile_pic)
     if user.role=="Admin":
         admin=User.query.filter_by(is_admin=True).first()
-        return render_template('profile.html',user=user,admin=admin)
+        profile_pic=url_for('static',filename='profile_pics/' + user.profile_pic)
+        return render_template('profile.html',user=user,admin=admin,profile_pic=profile_pic)
 
-@app.route('/profilepic',methods=['GET',"POST"])
-def upload_pic():
+@app.route('/profilepic/<int:id>',methods=['GET',"POST"])
+@check_session
+def upload_pic(id):
     user=User.query.get(id) #since id is primary key, it will directly search for that
     curr_user=User.query.filter_by(username=session['username']).first()
     if not user:
@@ -965,7 +1001,30 @@ def upload_pic():
     if user.username != session['username'] and not curr_user.is_admin:
         flash("Not authorized to perform this action!")
         return redirect(url_for('login'))
-    #if 
+    
+    if request.method=="POST":
+        profile=request.files['profile_pic']
+        if not profile:
+            flash("Please upload a file to change the profile picture",category="danger")
+            return redirect(url_for('profile'))
+        
+        # Validate the uploaded file to be only image type files
+        if what(profile) not in ['jpeg', 'png', 'gif', 'bmp']:
+            flash("Only image files are allowed!", category="danger")
+            return redirect(url_for('profile'))
+        
+        uploadpath="static\\profile_pics"
+        filename=secure_filename(curr_user.username+"_"+str(datetime.now().time())+"_"+profile.filename)
+        profile.save(os.path.join(uploadpath,filename))
+        final_path=filename
+        try:
+            user.profile_pic=final_path
+            db.session.commit()
+            flash('Added profile picture successfully',category="success")
+            return redirect(url_for('profile'))
+        except Exception as e:
+            flash("Something went wrong while adding post",category="danger")
+            return redirect(url_for('profile'))
 
 
 @app.route('/users/<int:id>/update',methods=["POST"])
@@ -977,8 +1036,12 @@ def update_profile(id):
         flash("Invalid User ID")
         return redirect(url_for('login'))
     if user.username != session['username'] and not curr_user.is_admin:
-        flash("Not authorized to perform this action!")
+        session.pop('username')
+        flash("Not authorized to perform this action!",category="danger")
         return redirect(url_for('login'))
+    if curr_user.is_admin:
+        flash("Admin cannot update their own profile through this!",category="danger")
+        return redirect(url_for('profile'))
     if request.method=="POST":
         if user.role=="Influencer":
             influencer=Influencer.query.filter_by(user_id=user.id).first()
@@ -1015,6 +1078,25 @@ def update_profile(id):
             influencer.category=category
             influencer.platform=platform
             db.session.commit()
+            flash("Profile updated successfully",category="success")
+            return redirect(url_for('profile'))
+        if user.role=="Sponsor":
+            sponsor=Sponsor.query.filter_by(user_id=user.id).first()
+            name=request.form.get('name')
+            industry=request.form.get('industry')
+            budget=request.form.get('budget')
+
+            if not name or not industry or not budget:
+                flash("Please fill all the fields",category="danger")
+                return redirect(url_for('profile'))
+            if len(name) > 32:
+                flash("Name should not be longer 32 characters ",category="danger")
+                return redirect(url_for('profile'))
+            sponsor.name=name
+            sponsor.industry=industry
+            sponsor.budget=budget
+            db.session.commit()
+            flash("Profile updated successfully",category="success")
             return redirect(url_for('profile'))
     return redirect(url_for('profile'))
 
@@ -1055,13 +1137,14 @@ def delete_user(id):
     user=User.query.get(id) #since id is primary key, it will directly search for that
     curr_user=User.query.filter_by(username=session['username']).first()
     if not user:
-        flash("Invalid User ID")
-        return redirect(url_for('profile'))
+        flash("Invalid User ID",category="danger")
+        return redirect(url_for('login'))
     if user.username != session['username'] and not curr_user.is_admin:
-        flash("Not authorized to perform this action!")
+        session.pop('username')
+        flash("Not authorized to perform this action!",category="danger")
         return redirect(url_for('profile'))
     if user.is_admin:
-        flash("You cannot delete an admin")
+        flash("You cannot delete an admin",category="danger")
         return redirect(url_for('profile'))
 
     db.session.delete(user)

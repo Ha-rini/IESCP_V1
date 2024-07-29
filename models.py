@@ -63,7 +63,7 @@ class Campaign(db.Model):
     visibility=db.Column(db.String(16),default="public")
     spo_id=db.Column(db.Integer,db.ForeignKey("sponsor.id"))
     is_flagged=db.Column(db.Boolean,default=False,nullable=False)
-    status=db.Column(db.String(32),default="active") #[active,completed,progress(?)]
+    status=db.Column(db.String(32),default="active") #[active,completed]
     progress=db.Column(db.Integer,nullable=False,default=0)
 
     adreqs=db.relationship("AdRequest",backref="campaign", lazy=True,cascade='all,delete-orphan')

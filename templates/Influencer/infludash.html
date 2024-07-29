@@ -126,6 +126,42 @@
 <hr>
 </div>
 <br>
+
+<div id="trans-table">                         
+  <h4 class="headings" style="margin-top: 15px">Completed Ad Requests</h4>
+  <hr>
+  {% if completed_adreqs|length == 0 %}
+  <h6>No Ad Requests completed</h6>
+  {% else %}
+  <div id="trans-table" style="margin: 10px;">
+  <table class="table">
+      <thead>
+      <tr>
+          <th scope="col">#</th>                        
+          <th scope="col">Campaign Name</th>                    
+          <th scope="col">Requirements</th>
+          <th scope="col">Payment Amount</th>                        
+          <th scope="col">Messages</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for a in completed_adreqs %}
+        <tr>
+          <td scope="row">{{loop.index}}</td>                    
+          <td>{{a.campaign.camp_name}} </td> 
+          <td>{{a.requirements}}</td>
+          <td>{{a.pay_amt}}</td>
+          <td>{{a.messages.meesage_body}}</td>             
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+</div>
+{% endif %}
+<hr>
+</div>
+<br>
+
 <div id="trans-table">                         
   <h4 class="headings" style="margin-top: 15px">Messages from sponsor</h4>
   <hr>

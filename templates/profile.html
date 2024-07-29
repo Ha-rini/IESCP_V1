@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+ {% extends 'layout.html' %}
 
 {% block style %}
 <style>
@@ -12,8 +12,9 @@
 
 
 {% block content %}
+
 <form action="{{url_for('update_profile',id=user.id)}}" method="post">
-<div class="mb-3">
+  <div class="mb-3" style="padding:20px">
     <div class="d-flex">
       <div class="card mb-3" style="width: 18rem;">
           <div class="card-img-top">
@@ -21,19 +22,36 @@
           </div>
           <div class="card-body">
             <h4 class="card-title">{{user.username}}</h4>
+            {% if user.role=="Influencer" %}
             <div class="mb-3 card-title">
               <label for="name" class="form-label">Username:</label>
               <input type="text" class="form-control" id="name" placeholder="Username" name="name" value="{{influencer.name}}" readonly>
             </div>
-            <p class="card-text">About: <br>
-              <textarea name="about" id="about" placeholder="Write something about yourself.." class="form-control mb-3">{{influencer.about}}</textarea>
+              <p class="card-text">About:<br>
+                {% if influencer.about != None %}
+                <textarea name="about" id="about" placeholder="Write something about yourself.." class="form-control mb-3"> 
+                  {{influencer.about}}
+                </textarea>
+                {% else %}
+                <textarea name="about" id="about" placeholder="Write something about yourself.." class="form-control mb-3"></textarea>
+                {% endif %}
+              </p>
+            {% elif user.role=="Sponsor" %}
+              <div class="mb-3">
+                <label for="name" class="form-label">Company/Individual Name:</label>
+                <input type="text" class="form-control" id="name" placeholder="name" name="name" value="{{sponsor.name}}">
+              </div>
+              {% elif user.role=="Admin" %}
+              Admin
+            {% endif %}
               
           </div>
       </div>
       <div>
         <div class="card mb-3" style="padding:10px">
           <div class="mb-3" style="width: 18rem;">
-              
+            {% if user.role=='Influencer' %}
+                
               <div class="mb-3">
                 <label for="category" class="form-label">Category:</label>
                 <input type="text" class="form-control" id="category" placeholder="Category" name="category" value="{{influencer.category}}">
@@ -54,27 +72,58 @@
           <div class="mb-3">
               <h6 class="card-title">Campaigns Participated in:</h6>
               
-              {% if influencer.adreqs | length == 0%}
+              {% if adreqs | length == 0%}
                 <h6>No campaigns yet</h6>
                 
               {% else %}
               <ul class="list-group">
-                {% for adreq in influencer.adreqs %}
+                {% for adreq in adreqs %}
 
-                  <li class="list-group-item"><h6 class="card-title">{{adreq.campaign.camp_name}}</h6></li>   
+                  <li class="list-group-item">
+                    <p class="card-title">{{adreq.campaign.camp_name}}</p>
+                  </li>   
                 {% endfor %}
               </ul>
+              {% endif %}
+
+              {% elif user.role=='Sponsor' %}
+
+              <div class="mb-3">
+                  <label for="industry" class="form-label">Industry:</label>
+                  <input type="text" class="form-control" id="industry" placeholder="industry" name="industry" value="{{sponsor.industry}}">
+              </div>
+              <div class="mb-3">
+                <label for="budget" class="form-label">Budget:</label>
+                <input type="text" class="form-control" id="budget" placeholder="budget" name="budget" value="{{sponsor.budget}}" >
+              </div>
+              <h6>Campaigns Created:</h6>
+              {% if sponsor.campaigns | length == 0%}
+                <h6>No campaigns yet</h6>
+                
+              {% else %}
+              <ul class="list-group">
+                {% for campaign in sponsor.campaigns %}
+                  <li class="list-group-item">
+                    <p class="card-title">{{campaign.camp_name}}</p>
+                  </li>   
+                {% endfor %}
+              </ul>
+              {% endif %}
+
+              {% elif user.role=='Admin' %}
+              No other info to show.
+              {% else %}
+                No other info to show.
               {% endif %}
               
           </div>
         </div> 
       </div>
-      
     </div>
     <div class="d-flex">
       <div>
         <div class="mb-3">
-          <button type="submit" class="btn btn-primary">Update Profile</button>
+          <button type="submit" class="btn btn-secondary">Update My Profile</button>
         </div>
           </form>
           <button class="btn btn-primary mb-3" type="button" onclick="change_pass_show()">Change Password</button>
@@ -94,8 +143,10 @@
       </div>
       <div>
         <div class="mb-3">
-          <form action="#" method="post">
-              <button type="submit" class="btn btn-warning mb-3">Change Profile Pic</button>
+          <form action="{{url_for('upload_pic',id=user.id)}}" method="post" enctype="multipart/form-data" id="formTrigger">
+            <input type="file" name="profile_pic" id="profile_pic" accept="image/*" style="display: none;">
+            <button type="button" class="btn btn-warning mb-3" onclick="triggerFileInput()">Change Profile Pic</button>
+              
           </form>
         </div>
         <div class="mb-3">
@@ -119,6 +170,25 @@
         x.style.display = "none";
       }
     }
+
+    function triggerFileInput(){
+      document.getElementById('profile_pic').click();
+    }
+
+    function submitForm(){
+      document.getElementById('formTrigger').submit();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const fileInput = document.getElementById('profile_pic');
+      fileInput.addEventListener('change', function() {
+          if (fileInput.files.length > 0) {
+              submitForm();
+          }
+      });
+  });
+
+
     </script>
     
   {% endblock %}
