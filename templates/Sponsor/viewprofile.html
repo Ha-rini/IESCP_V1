@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+<style>
+    .d-flex {
+      display: flex !important;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<form action="{{url_for('select_influencer',id=campaign.id,influ_id=influencer.id)}}" method="GET">
+    <input type="hidden" name="source" value="{{ source }}">
+    {% if source == 'edit' %}
+    <input type="hidden" name="ad_id" value="{{ ad_id }}">
+    {% endif %}
+<div class="mb-3" style="padding:20px">
+    <div class="d-flex">
+      <div class="card mb-3" style="width: 18rem;">
+          <div class="card-img-top">
+              <img src="{{profile_pic}}" class="card-img-top" alt="Profile pic" style="height:300px">
+          </div>
+            <div class="card-body">
+                <div class="mb-3 card-title">
+                    <h4>Username:</h4>
+                    <h4 class="card-title">{{influencer.name}}</h4>
+                </div>
+                    {% if influencer.about != None %}
+                    <p class="card-text">About:<br>
+                        {{influencer.about}}
+                    {% endif %}
+            </div>
+        </div>
+    <div>
+        <div class="card mb-3" style="padding:10px">
+            <div class="mb-3" style="width: 18rem;">
+                  
+                <div class="mb-3">
+                    Category:
+                    {{influencer.category}} 
+                </div>
+                <div class="mb-3">
+                    Niche:
+                    {{influencer.niche}}  
+                </div>
+                <div class="mb-3">
+                    Reach:
+                    {{influencer.reach}}
+                </div>
+                <div class="mb-3">
+                    Platform:
+                    {{influencer.platform}}
+                </div>
+            </div>
+            <div class="mb-3">
+                <h6 class="card-title">Campaigns Participated in:</h6>
+                
+                {% if adreqs | length == 0%}
+                  <h6>No campaigns yet</h6>
+                  
+                {% else %}
+                <ul class="list-group">
+                  {% for adreq in adreqs %}
+  
+                    <li class="list-group-item">
+                      <p class="card-title">{{adreq.campaign.camp_name}}</p>
+                    </li>   
+                  {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div> 
+    </div>
+    </div>
+    <div class="d-flex">
+        <div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">Select Influencer</button>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+{% endblock %}

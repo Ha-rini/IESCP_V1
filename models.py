@@ -15,7 +15,7 @@ class User(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String(32),nullable=False,unique=True)
     passhash=db.Column(db.String(64),nullable=False)
-    role=db.Column(db.String(16),default="User")
+    role=db.Column(db.String(16))
     is_flagged=db.Column(db.Boolean,default=False,nullable=False)
     is_admin=db.Column(db.Boolean,default=False,nullable=False)
     profile_pic=db.Column(db.String,nullable=False,default="default_pic.jpg")
@@ -34,8 +34,6 @@ class Sponsor(db.Model):
 
     campaigns=db.relationship('Campaign',backref="sponsor")
     
-
-
 class Influencer(db.Model):
     __tablename__="influencer"
     id=db.Column(db.Integer,primary_key=True)
@@ -48,7 +46,6 @@ class Influencer(db.Model):
     about=db.Column(db.String,nullable=True)
 
     adreqs=db.relationship("AdRequest",backref="influencer", lazy=True,cascade='all,delete-orphan')
-    messages=db.relationship("Message",backref="influencer", lazy=True, cascade="all,delete-orphan")
 
 class Campaign(db.Model):
     __tablename__="campaign"
@@ -60,7 +57,7 @@ class Campaign(db.Model):
     start_date=db.Column(db.Date,nullable=False)
     end_date=db.Column(db.Date,nullable=False)
     goals=db.Column(db.String(256))
-    visibility=db.Column(db.String(16),default="public")
+    visibility=db.Column(db.String(16),default="Public")
     spo_id=db.Column(db.Integer,db.ForeignKey("sponsor.id"))
     is_flagged=db.Column(db.Boolean,default=False,nullable=False)
     status=db.Column(db.String(32),default="active") #[active,completed]
@@ -73,27 +70,10 @@ class AdRequest(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     influ_id=db.Column(db.Integer,db.ForeignKey("influencer.id"))
     camp_id=db.Column(db.Integer,db.ForeignKey("campaign.id"))
-    #messages=db.Column(db.String(256))
+    message=db.Column(db.String(256))
     requirements=db.Column(db.String(256),nullable=False)
     pay_amt=db.Column(db.Integer,nullable=False)
     status=db.Column(db.String(32),default="pending") #[pending, accepted, rejected, requested, completed, messaged]
-
-    messages=db.relationship("Message",backref="adrequest", lazy=True, cascade="all,delete-orphan")
-
-
-class Message(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    message_body=db.Column(db.String(256),nullable=False)
-    ad_id=db.Column(db.Integer,db.ForeignKey("adrequest.id"))
-    influ_id=db.Column(db.Integer,db.ForeignKey("influencer.id"))
-    datetime=db.Column(db.DateTime,nullable=False,default=datetime.now())
-
-class Rating(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    camp_id=db.Column(db.Integer,db.ForeignKey("campaign.id"))
-    influ_id=db.Column(db.Integer,db.ForeignKey("influencer.id"))
-    rating=db.Column(db.Integer)
-
 
 with app.app_context(): #only when flask server/ application is ready then create the tables
     db.create_all()

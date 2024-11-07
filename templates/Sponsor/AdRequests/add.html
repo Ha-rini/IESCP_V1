@@ -7,7 +7,7 @@
                 <div class="mb-3">
                   <label for="infu-name" class="form-label">Influencer Name</label>
                   <input type="text" class="form-control mb-3" id="influ-name" placeholder="Influencer Name" name="influ-name" {% if influencer %} value="{{influencer.name}}" {% endif %}>
-                  <a href="{{url_for('search_influencer',id=campaign.id)}}"><button type="button" class="btn btn-primary mb-3">
+                  <a href="{{url_for('search_influencer',id=campaign.id,source='add')}}"><button type="button" class="btn btn-primary mb-3">
                     <i class="fa fa-search" aria-hidden="true"></i> Find Influencer
                     </button>
                   </a>

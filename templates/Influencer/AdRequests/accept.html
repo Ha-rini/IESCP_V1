@@ -7,6 +7,7 @@
     <h6>Requirements: {{a.requirements}}</h6>
     <h6>Payment Amount: {{a.pay_amt}}</h6>
     <h6>Sponsor: {{a.campaign.sponsor.name}}</h6>
+    <h6>Message: {{a.message}}</h6>
     <hr>
     Are you sure you want to accept this ad request?<br><br>
     <form action="{{url_for('accept_adreq',ad_id=a.id)}}" method="post">

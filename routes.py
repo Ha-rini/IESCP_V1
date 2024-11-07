@@ -1,5 +1,5 @@
 from flask import Flask,render_template,request, redirect, session, url_for,flash
-from models import db, User, Sponsor, Influencer, AdRequest, Campaign, Message, Rating
+from models import db, User, Sponsor, Influencer, AdRequest, Campaign
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -30,14 +30,14 @@ def check_admin(func):
     @wraps(func) #to avoid the server throwing an error for not having unique functions;   func-placeholder for the function passed (eg. profile(), login(), etc.)
     def wrapper(*args, **kwargs): #pack and unpacking of : args- positional arguments ; kwargs- keyword arguments
         if 'username' not in session:
-            flash("You need to login first")
+            flash("You need to login first",category="danger")
             return redirect(url_for('login'))
         user=User.query.filter_by(username=session['username']).first()
         if not user:
             session.pop('username')
             return redirect(url_for('login'))
         if not user.is_admin:
-            flash("You are not authorized to visit this page")
+            flash("You are not authorized to visit this page",category="danger")
             return redirect(url_for('home'))
         return func(*args, **kwargs)
     return wrapper
@@ -105,7 +105,10 @@ def spo_register():
         industry=request.form.get('industry')
         budget=request.form.get('budget')
         print(name,user.id)
-        
+        sponsor=Sponsor.query.filter_by(name=name).first()
+        if sponsor:
+            flash('The name aldready exists',category="danger")
+            return redirect(url_for('spo_register',user_id=user.id))
         if not name or not budget:
             flash("Please fill all the fields",category="danger")
             return redirect(url_for('spo_register'))
@@ -269,11 +272,11 @@ def sponsor_search():
                     join(Sponsor.user).
                     filter(Campaign.camp_name.ilike(f'%{query}%'),
                            Campaign.is_flagged==0,User.id==user.id)).all()
-        campaigns.extend(Campaign.query.filter(
-            Campaign.niche.ilike(f'%{query}%'),
-            Campaign.is_flagged == False,
-            Campaign.visibility == "Public"
-        ).all())
+        campaigns.extend(Campaign.query.join(Campaign.sponsor).
+                    join(Sponsor.user).filter(
+                        Campaign.niche.ilike(f'%{query}%'),
+                        Campaign.is_flagged==0,
+                        User.id==user.id).all())
         influencers=Influencer.query.join(Influencer.user).filter(
                         Influencer.name.ilike(f'%{query}%'),
                         User.is_flagged==False
@@ -296,6 +299,7 @@ def sponsor_search():
         campaigns=list(set(campaigns))
         influencers=list(set(influencers))
     return render_template('Sponsor/search.html',query=query,all_campaigns=all_campaigns, campaigns=campaigns,all_influencers=all_influencers,influencers=influencers)
+
 
 @app.route('/adminsearch')
 @check_session
@@ -320,6 +324,10 @@ def admin_search():
 def search_influencer(id):
     query=request.args.get('search')
     influencers=None
+    source = request.args.get('source', 'add')  # Default to 'add' if not provided
+    ad_id = request.args.get('ad_id') if source == 'edit' else None
+
+    print(source)
     all_influencers = Influencer.query.join(Influencer.user).filter(
                     User.is_flagged == False).all()
     if query:
@@ -344,15 +352,48 @@ def search_influencer(id):
                     )
         influencers=list(set(influencers))
         print(influencers)
-    return render_template('Sponsor/search_influencer.html',query=query,
-                           all_influencers=all_influencers,influencers=influencers,id=id)
+    return render_template('Sponsor/search_influencer.html',query=query,all_influencers=all_influencers,
+                           influencers=influencers,id=id,source=source,ad_id=ad_id)
+
+@app.route('/viewprofile/<int:id>/<int:influ_id>')
+@check_session
+def view_profile(id,influ_id):
+    campaign=Campaign.query.get(id)
+    influencer=Influencer.query.get(influ_id)
+    source = request.args.get('source', 'add')  # Default to 'add' if not provided
+    ad_id = request.args.get('ad_id') if source == 'edit' else None
+
+    if not influencer:
+        flash("Influencer you are looking for doesn't exist",category="danger")
+        return redirect(url_for('sponsor_search'))
+    user=User.query.filter_by(id=influencer.user_id).first()
+    profile_pic=url_for('static',filename='profile_pics/' + user.profile_pic)
+    adreqs=(AdRequest.query
+                .join(Influencer, AdRequest.influ_id == Influencer.id)
+                .join(Campaign, AdRequest.camp_id == Campaign.id)
+                .filter(AdRequest.status.in_(["completed", "accepted"]),Influencer.id==influencer.id)
+                .all())
+    print(source)
+    return render_template("Sponsor/viewprofile.html",influencer=influencer,
+                           campaign=campaign,adreqs=adreqs,profile_pic=profile_pic,
+                           source=source,ad_id=ad_id)
+
 
 @app.route('/selectinfluencer/<int:id>/<int:influ_id>')
 @check_session
 def select_influencer(id,influ_id):
     influencer=Influencer.query.get(influ_id)
     campaign=Campaign.query.get(id)
-    return render_template('Sponsor/AdRequests/add.html',campaign=campaign,influencer=influencer)
+    source = request.args.get('source','add')  # Default to 'add' if not provided
+    print(source)
+    ad_id = request.args.get('ad_id') if source == 'edit' else None
+    if source == 'edit':
+        adreq=AdRequest.query.get(ad_id)
+        print(adreq)
+        print(influencer)
+        return render_template('Sponsor/AdRequests/edit.html', campaign=campaign, adreq=adreq, influencer=influencer,source=source)
+    else:
+        return render_template('Sponsor/AdRequests/add.html', campaign=campaign, influencer=influencer,source=source)
 
 
 @app.route('/influencer/adrequest/request/<int:id>',methods=['GET','POST'])
@@ -371,6 +412,7 @@ def request_adreq(id):
         message=request.form.get("message")
         requirements=request.form.get("requirements")
         pay_amt=request.form.get("amt")
+        print(message)
         campaign=Campaign.query.filter_by(camp_name=campname).first()
         print(influname,campname,message,requirements,pay_amt)
         if not influname or not campname or not message or not pay_amt or not requirements:
@@ -384,14 +426,11 @@ def request_adreq(id):
             return redirect(url_for('home'))
         adreq=AdRequest.query.filter_by(influ_id=influencer.id,camp_id=campaign.id).first()
         if adreq:
-            flash("You have already received the ad request or sent an ad request",category="danger")
+            flash("You have already received the ad request or sent an ad request or rejected the ad request",category="danger")
             return redirect(url_for('home'))    
         status='requested'    
-        adreq=AdRequest(requirements=requirements, pay_amt=pay_amt, influencer=influencer, campaign=campaign,status=status)
+        adreq=AdRequest(requirements=requirements, pay_amt=pay_amt, influencer=influencer, campaign=campaign,status=status,message=message)
         db.session.add(adreq)
-        db.session.commit()
-        message=Message(message_body=message,influencer=influencer,adrequest=adreq)
-        db.session.add(message)
         db.session.commit()
         flash("Ad Request sent successfully",category="success")
         return redirect(url_for('search_campaign'))
@@ -407,7 +446,6 @@ def edit_request_adreq(id,ad_id):
     adreq=AdRequest.query.get(ad_id)
     print(campaign.camp_name,adreq.influencer.name)
     print(adreq)
-    message=Message.query.filter_by(ad_id=ad_id,influ_id=adreq.influencer.id).first()
     if not campaign:
         flash("Campaign doesn't exist",category="danger")
         return redirect(url_for('home'))
@@ -425,20 +463,18 @@ def edit_request_adreq(id,ad_id):
         print(influname,campname,message,requirements,pay_amt)
         if not influname or not campname or not message or not requirements or not pay_amt:
             flash("Please fill all the mandatory fields",category="danger")
-            return redirect(url_for('edit_adreq',id=id,ad_id=ad_id))
-        if not influencer:
-            flash("Influencer name doesn't exist. Check the spelling or find an influencer",category="danger")
-            return redirect(url_for('add_adreq',id=id,ad_id=ad_id))
+            return redirect(url_for('edit_request_adreq',id=id,ad_id=ad_id))
         if not campaign:
             flash("Camapign doesn't exist",category="danger")
             return redirect(url_for('home'))
         adreq=AdRequest.query.get(ad_id)
         adreq.requirements=requirements
         adreq.pay_amt=pay_amt
+        adreq.message=message
         db.session.commit()
         flash('Ad Request edited successfully',category="success")
         return redirect(url_for('home'))
-    return render_template('Influencer/AdRequests/edit.html',campaign=campaign,adreq=adreq,message=message)
+    return render_template('Influencer/AdRequests/edit.html',campaign=campaign,adreq=adreq)#request_adreq)
 
 
 @app.route('/influencer/adrequest/deleterequest/<int:id>/<int:ad_id>',methods=['GET','POST'])
@@ -448,7 +484,7 @@ def delete_request_adreq(id,ad_id):
     adreq=AdRequest.query.get(ad_id)
     if request.method=='POST':
         if not campaign:
-            flash("Campaign doesn't exist")
+            flash("Campaign doesn't exist",category="danger")
             return redirect(url_for('home'))
         if not adreq:
             flash("Ad Request doesn't exist",category="danger")
@@ -534,6 +570,18 @@ def accept_adreq_from_influencer(ad_id):
             flash("Ad Request doesn't exist",category="danger")
             return redirect(url_for('home'))
         adreq.status="accepted"
+        campaign=Campaign.query.filter(adreq.camp_id==Campaign.id).first()
+        completed_adreqs=AdRequest.query.filter_by(camp_id=campaign.id,status="completed").count()
+        adreqs= AdRequest.query.filter(
+                AdRequest.camp_id == campaign.id,
+                AdRequest.status.in_(["completed", "accepted", "pending"])
+                ).count()
+        print(campaign)
+        print(completed_adreqs,adreqs)
+        print(completed_adreqs,adreqs)
+        progress=int((completed_adreqs/float(adreqs))*100)
+        print(progress)
+        campaign.progress=progress
         db.session.commit()
         flash("Accepted Ad Request",category="success")
         return redirect(url_for('adreqs_list',id=adreq.campaign.id))
@@ -561,7 +609,7 @@ def add_campaign():
     user=User.query.filter_by(username=session['username']).first()
     sponsor=Sponsor.query.filter_by(user_id=user.id).first()
     if not user or not sponsor:
-        flash("The account doesn't exist. Please login again!")
+        flash("The account doesn't exist. Please login again!",category="danger")
         return redirect(url_for('login'))
     return render_template('Sponsor/Campaigns/add.html',sponsor=sponsor)
 
@@ -571,7 +619,7 @@ def add_campaign():
 def add_campaign_post(id):
     sponsor=Sponsor.query.get(id)
     if not sponsor:
-        flash("Sponsor doesn't exist")
+        flash("Sponsor doesn't exist",category="danger")
         return redirect(url_for('register'))
     name=request.form.get("camp-name")
     start_date=request.form.get("start-date")
@@ -581,6 +629,7 @@ def add_campaign_post(id):
     desc=request.form.get("camp-desc")
     goals=request.form.get("camp-goal")
     visibility=request.form.get("camp-visibility")
+    print(visibility)
     if not name or not start_date or not end_date or not budget:
         flash("Please fill all the mandatory fields",category="danger")
         return redirect(url_for('add_campaign'))
@@ -621,7 +670,7 @@ def edit_campaign(id):
     campaign=Campaign.query.get(id)
     sponsor=campaign.sponsor
     if not campaign:
-        flash("Campaign doesn't exist")
+        flash("Campaign doesn't exist",category="danger")
         return redirect(url_for('register'))
     if request.method=="POST":
         name=request.form.get("camp-name")
@@ -675,7 +724,7 @@ def delete_campaign(id):
     campaign=Campaign.query.get(id)
     if request.method=='POST':
         if not campaign:
-            flash("Campaign doesn't exist")
+            flash("Campaign doesn't exist",category="danger")
             return redirect(url_for('home'))
         db.session.delete(campaign)
         db.session.commit()
@@ -730,11 +779,8 @@ def add_adreq(id):
         if adreq:
             flash("You have already created the ad request",category="danger")
             return redirect(url_for('adreqs_list',id=id))        
-        adreq=AdRequest(requirements=requirements, pay_amt=pay_amt, influencer=influencer, campaign=campaign)
+        adreq=AdRequest(requirements=requirements, pay_amt=pay_amt, influencer=influencer, campaign=campaign, message=message)
         db.session.add(adreq)
-        db.session.commit()
-        message=Message(message_body=message,influencer=influencer,adrequest=adreq)
-        db.session.add(message)
         db.session.commit()
         flash("Ad Request sent successfully",category="success")
         return redirect(url_for('adreqs_list',id=id))
@@ -745,9 +791,9 @@ def add_adreq(id):
 def edit_adreq(id,ad_id):
     campaign=Campaign.query.get(id)
     adreq=AdRequest.query.get(ad_id)
+    influencer=adreq.influencer
     print(campaign.camp_name,adreq.influencer.name)
     print(adreq)
-    message=Message.query.filter_by(ad_id=ad_id,influ_id=adreq.influencer.id).first()
     if not campaign:
         flash("Campaign doesn't exist",category="danger")
         return redirect(url_for('home'))
@@ -768,18 +814,23 @@ def edit_adreq(id,ad_id):
             return redirect(url_for('edit_adreq',id=id,ad_id=ad_id))
         if not influencer:
             flash("Influencer name doesn't exist. Check the spelling or find an influencer",category="danger")
-            return redirect(url_for('add_adreq',id=id,ad_id=ad_id))
+            return redirect(url_for('edit_adreq',id=id,ad_id=ad_id))
         if not campaign:
             flash("Camapign doesn't exist",category="danger")
             return redirect(url_for('home'))
+        adreq=AdRequest.query.filter_by(influ_id=influencer.id,camp_id=campaign.id).first()
+        # if alr_adreq:
+        #     flash("You have already created the ad request",category="danger")
+        #     return redirect(url_for('adreqs_list',id=id))        
         adreq=AdRequest.query.get(ad_id)
         adreq.influencer=influencer
         adreq.requirements=requirements
         adreq.pay_amt=pay_amt
+        adreq.message=message
         db.session.commit()
         flash('Ad Request edited successfully',category="success")
         return redirect(url_for('adreqs_list',id=id))
-    return render_template('Sponsor/AdRequests/edit.html',campaign=campaign,adreq=adreq,message=message)
+    return render_template('Sponsor/AdRequests/edit.html',campaign=campaign,influencer=influencer,adreq=adreq)
 
 @app.route('/adreqcomplete/<int:id>/<int:ad_id>')
 @check_session
@@ -805,7 +856,7 @@ def delete_adreq(id,ad_id):
     adreq=AdRequest.query.get(ad_id)
     if request.method=='POST':
         if not campaign:
-            flash("Campaign doesn't exist")
+            flash("Campaign doesn't exist",category="danger")
             return redirect(url_for('home'))
         if not adreq:
             flash("Ad Request doesn't exist",category="danger")
@@ -902,9 +953,10 @@ def stats():
         if not sponsor:
             flash("You need to login first",category="danger")
             return redirect(url_for('login'))
+        campaigns=Campaign.query.filter_by(spo_id=sponsor.id, is_flagged=False).all()
         active_campaigns=Campaign.query.filter_by(spo_id=sponsor.id, is_flagged=False,status="active").all()
         completed_campaigns=Campaign.query.filter_by(spo_id=sponsor.id, is_flagged=False,status="completed").all()
-        adreqs=[adreq for campaign in active_campaigns for adreq in campaign.adreqs]
+        adreqs=[adreq for campaign in campaigns for adreq in campaign.adreqs]
         statuses = ["pending", "requested", "accepted", "rejected", "completed"]
         status_counts = Counter() 
         for adreq in adreqs:
@@ -912,7 +964,7 @@ def stats():
                 status_counts[adreq.status] += 1
         data_counts = [status_counts[status] for status in statuses]
         print(data_counts)
-        return render_template("chart.html",user=user,sponsor=sponsor,active_campaigns=active_campaigns,
+        return render_template("chart.html",user=user,sponsor=sponsor,active_campaigns=active_campaigns, campaigns=campaigns,
                                completed_campaigns=completed_campaigns,adreqs=adreqs,data_counts=data_counts)
     elif user.role=="Influencer":
         influencer=Influencer.query.filter_by(user_id=user.id).first()
@@ -927,13 +979,15 @@ def stats():
                 status_counts[adreq.status] += 1
         data_counts = [status_counts[status] for status in statuses]
         earnings_data=defaultdict(float)
-        for adreq in influencer.adreqs:
+        earnings_adreqs=AdRequest.query.filter_by(influ_id=influencer.id,status="completed").all()
+        for adreq in earnings_adreqs:
             campaign_name = adreq.campaign.camp_name  # Replace with actual attribute accessing campaign's name
             earnings_data[campaign_name] += adreq.pay_amt
 
         campaign_names = list(earnings_data.keys())
         earnings_data = list(earnings_data.values())
-        return render_template("chart.html",user=user,influencer=influencer,adreqs=adreqs,data_counts=data_counts,earnings_data=earnings_data,campaign_names=campaign_names)
+        return render_template("chart.html",user=user,influencer=influencer,adreqs=adreqs,data_counts=data_counts,earnings_data=earnings_data,
+                               campaign_names=campaign_names,earnings_adreqs=earnings_adreqs)
     
     elif user.role=="Admin":
         if not user:
@@ -996,10 +1050,11 @@ def upload_pic(id):
     user=User.query.get(id) #since id is primary key, it will directly search for that
     curr_user=User.query.filter_by(username=session['username']).first()
     if not user:
-        flash("Invalid User ID")
+        flash("Invalid User ID",category="danger")
         return redirect(url_for('login'))
-    if user.username != session['username'] and not curr_user.is_admin:
-        flash("Not authorized to perform this action!")
+    if user.username != session['username']:
+        session.pop('username')
+        flash("Not authorized to perform this action!",category="danger")
         return redirect(url_for('login'))
     
     if request.method=="POST":
@@ -1033,9 +1088,9 @@ def update_profile(id):
     user=User.query.get(id) #since id is primary key, it will directly search for that
     curr_user=User.query.filter_by(username=session['username']).first()
     if not user:
-        flash("Invalid User ID")
+        flash("Invalid User ID",category="danger")
         return redirect(url_for('login'))
-    if user.username != session['username'] and not curr_user.is_admin:
+    if user.username != session['username']:
         session.pop('username')
         flash("Not authorized to perform this action!",category="danger")
         return redirect(url_for('login'))
@@ -1106,11 +1161,11 @@ def change_pass(id):
     user=User.query.get(id) #since id is primary key, it will directly search for that
     curr_user=User.query.filter_by(username=session['username']).first()
     if not user:
-        flash("Invalid User ID")
+        flash("Invalid User ID",category="danger")
         return redirect(url_for('login'))
-    if user.username != session['username'] and not curr_user.is_admin:
+    if user.username != session['username']:
         session.pop('username')
-        flash("Not authorized to perform this action!")
+        flash("Not authorized to perform this action!",category="danger")
         return redirect(url_for('login'))
     if request.method=="POST":
         curr_pass=request.form.get('password')

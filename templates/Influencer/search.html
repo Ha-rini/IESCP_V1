@@ -14,9 +14,10 @@
     <br>
     {% if not query %}
     <br>
-        <h2>Campaigns</h2>
+        <h4>Campaigns</h4>
+        <hr>
         {% if all_campaigns | length == 0 %}
-        <h5>No Public campaigns available</h5>
+        <h6>No Public campaigns available</h6>
         {% else %}
         <div id="trans-table">
             <table class="table">
@@ -51,8 +52,8 @@
         
         {% endif %}
     {% else %}
-    <h2>Campaigns</h2>
-    <br>
+    <h4>Campaigns</h4>
+    <hr>
         {% if campaigns %}
         <div id="trans-table">
             <table class="table">
@@ -84,7 +85,7 @@
             </tr>
             {% endfor %}
         {% else %}
-            <h2>No campaigns matches found.</h2>
+            <h6>No campaigns matches found.</h6>
         {% endif %}           
     {% endif %}
 

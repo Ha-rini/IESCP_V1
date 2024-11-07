@@ -37,7 +37,9 @@
                                 <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
                             </form>
                         {% elif user.is_flagged %}
-                            <p style="color:red">Flagged</p>
+                        <form action="{{url_for('unflag_user',id=user.id)}}" method="POST">
+                            <button class="btn btn-danger" type="submit"><i class="fa fa-flag-checkered" aria-hidden="true"></i> UnFlag</button>
+                        </form>
                         {% else %}
                             <p><b>Cannot flag admin.</b></p>
                         {% endif %}
@@ -65,6 +67,7 @@
                     <th scope="col">End date</th>
                     <th scope="col">Budgets</th>
                     <th scope="col">Description</th>
+                    <th scope="col">Niche</th>
                     <th scope="col">Goals</th>
                     <th scope="col">Visibility</th>
                     <th scope="col">Actions</th>               
@@ -79,6 +82,7 @@
                         <td>{{c.end_date}}</td>
                         <td>{{c.budget}}</td>
                         <td>{{c.description}}</td>
+                        <td>{{c.niche}}</td>
                         <td>{{c.goals}}</td>
                         <td>{{c.visibility}}</td>        
                         <td>
@@ -87,7 +91,9 @@
                                 <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
                             </form>
                             {% else %}
-                                <p style="color:red">Flagged</p>
+                            <form action="{{url_for('unflag_campaign',id=c.id)}}" method="POST">
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-flag-checkered" aria-hidden="true"></i> UnFlag</button>
+                            </form>
                             {% endif %}
                             
                         </td>
@@ -124,7 +130,9 @@
                                 <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
                             </form>
                         {% elif user.is_flagged %}
-                            <p style="color:red">Flagged</p>
+                        <form action="{{url_for('unflag_user',id=user.id)}}" method="POST">
+                            <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                        </form>
                         {% else %}
                             <p><b>Cannot flag admin.</b></p>
                         {% endif %}
@@ -152,6 +160,7 @@
                     <th scope="col">End date</th>
                     <th scope="col">Budgets</th>
                     <th scope="col">Description</th>
+                    <th scope="col">Niche</th>
                     <th scope="col">Goals</th>
                     <th scope="col">Visibility</th>
                     <th scope="col">Actions</th>               
@@ -166,6 +175,7 @@
                         <td>{{c.end_date}}</td>
                         <td>{{c.budget}}</td>
                         <td>{{c.description}}</td>
+                        <td>{{c.niche}}</td>
                         <td>{{c.goals}}</td>
                         <td>{{c.visibility}}</td>        
                         <td>
@@ -174,7 +184,9 @@
                                 <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
                             </form>
                             {% else %}
-                                <p style="color:red">Flagged</p>
+                            <form action="{{url_for('unflag_campaign',id=c.id)}}" method="POST">
+                                <button class="btn btn-danger" type="submit"><i class="fa fa-flag" aria-hidden="true"></i> Flag</button>
+                            </form>
                             {% endif %}
                             
                         </td>

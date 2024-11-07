@@ -5,17 +5,18 @@
               <div  id="new-box">
               <h5 align="center">Edit Ad Request</h5>              
                 <label for="infu-name" class="form-label">Influencer Name</label>
-                <input type="text" class="form-control" id="influ-name" placeholder="Influencer Name" name="influ-name" value="{{adreq.influencer.name}}">
-                <button type="button" class="btn btn-primary mb-3">
+                <input type="text" class="form-control mb-3" id="influ-name" placeholder="Influencer Name" name="influ-name" value="{{influencer.name}}">
+                <a href="{{url_for('search_influencer',id=campaign.id,source='edit',ad_id=adreq.id)}}"><button type="button" class="btn btn-primary mb-3">
                   <i class="fa fa-search" aria-hidden="true"></i> Find Influencer
-                </button>
+                  </button>
+                </a>
                 <div class="mb-3">
                   <label for="camp-name" class="form-label">Campaign Name</label>
                   <input type="text" class="form-control" id="camp-name" placeholder="Campaign Name" name="camp-name" value="{{campaign.camp_name}}" readonly>
                 </div>
                 <div class="mb-3">
                     <label for="message" class="form-label">Message</label>
-                    <input type="text" class="form-control" id="message" placeholder="Message sent to influencer" name="message" value="{{message.message_body}}" readonly >
+                    <input type="text" class="form-control" id="message" placeholder="Message sent to influencer" name="message" value="{{adreq.message}}">
                 </div>
                 <div class="mb-3">
                   <label for="req" class="form-label">Requirements</label>
